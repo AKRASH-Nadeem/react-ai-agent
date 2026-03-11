@@ -1,0 +1,111 @@
+/*
+ * Paste this block into your globals.css.
+ * All keyframes used by the animation token system in tailwind.animations.ts.
+ * The prefers-reduced-motion rule at the bottom is MANDATORY — never remove it.
+ */
+
+/* ── Keyframes ──────────────────────────────────────────────────────── */
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes reveal-down {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0);     }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1);    }
+}
+
+@keyframes slide-in-from-right {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0);    }
+}
+
+@keyframes slide-in-from-left {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0);     }
+}
+
+/* Reading progress bar — driven by CSS Scroll-Driven Animations */
+@keyframes grow-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* View Transitions — page-level route animations */
+@keyframes slide-from-right {
+  from { transform: translateX(30px); opacity: 0; }
+}
+@keyframes slide-to-left {
+  to   { transform: translateX(-30px); opacity: 0; }
+}
+
+/* ── View Transitions ───────────────────────────────────────────────── */
+
+::view-transition-old(root) {
+  animation: 200ms ease-in both slide-to-left;
+}
+::view-transition-new(root) {
+  animation: 300ms ease-out both slide-from-right;
+}
+
+/* ── Scroll-Driven Utilities ────────────────────────────────────────── */
+
+.reading-progress {
+  animation: grow-progress linear both;
+  animation-timeline: scroll();
+  transform-origin: left;
+}
+
+/* Reveal on scroll — requires @supports fallback for non-Chromium browsers */
+.reveal-on-scroll {
+  opacity: 0; /* fallback: hidden if no scroll-driven animation support */
+}
+
+@supports (animation-timeline: scroll()) {
+  .reveal-on-scroll {
+    opacity: 1;
+    animation: reveal-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 30%;
+  }
+}
+
+/* ── MANDATORY: prefers-reduced-motion ──────────────────────────────── */
+/*
+ * This block is non-negotiable. Every project that uses animations must
+ * include it. Removing it creates WCAG 2.2 violations for users with
+ * vestibular disorders, epilepsy, and motion sensitivity.
+ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration:        0.01ms !important;
+    animation-iteration-count: 1      !important;
+    transition-duration:       0.01ms !important;
+    scroll-behavior:           auto   !important;
+  }
+
+  /* Disable View Transitions entirely under reduced motion */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
