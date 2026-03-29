@@ -1,4 +1,7 @@
+---
 name: react-storage-utilities
+requires:
+  - use-debounce@^10
 description: |
   Use when the project needs browser storage, timers, file operations, keyboard shortcuts,
   print styles, or the Web Share API. Trigger on:
@@ -13,6 +16,12 @@ description: |
   "print styles", "print layout", "@media print", "printable report",
   "share button", "Web Share API", "native share", "share this page",
   "cart persistence", "persistent cart".
+---
+> **Version check required** — before using any example in this skill:
+> `cat package.json | grep "use-debounce"` → if major differs from `requires:`, run the
+> **Version-Aware Skill Protocol** in `versions.lock.md` and query Context7 with your
+> installed version before writing code.
+
 ---
 
 > ⚠️ **Examples are version-anchored** to `versions.lock.md`. Verify method names and imports for the installed version via Context7 before use.

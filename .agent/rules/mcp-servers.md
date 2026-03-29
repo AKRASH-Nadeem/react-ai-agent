@@ -30,12 +30,44 @@ trigger: always_on
 - Any Playwright or Vitest configuration
 - Any npm package — no exceptions. "I know this from training" is not a valid reason to skip Context7.
 
-**Search pattern**: `[library] [specific feature]`
+**Standard query pattern**: `[library] [specific feature]`
 Examples:
 - `react tanstack query v5 optimistic updates`
 - `tailwindcss v4 container queries`
 - `shadcn form field validation`
 - `zustand v5 slices pattern`
+
+**Version-specific query pattern** — use this when a skill's baseline version
+differs from the installed version:
+
+`[library] v[INSTALLED_MAJOR] [specific feature]`
+
+This tells Context7 to return docs for the version actually installed in the
+project, not the latest. Always prefer the installed version over "latest" when
+writing code for an existing codebase.
+
+Examples of version-specific queries:
+```
+msw v1 rest handlers setup
+msw v2 http HttpResponse json
+tanstack react-query v4 useQuery onSuccess
+tanstack react-query v5 useQuery gcTime
+framer-motion v10 AnimatePresence exit
+motion v11 AnimatePresence exit
+zustand v4 create store middleware
+zustand v5 create store useShallow
+tailwindcss v3 config extend theme
+tailwindcss v4 theme css variables
+react-hook-form v7 useForm register
+sentry react v7 init BrowserTracing
+sentry react v8 init browserTracingIntegration
+```
+
+**Version resolution hierarchy:**
+1. Check `package.json` for installed version
+2. If installed major = skill baseline major → standard query is fine
+3. If installed major ≠ skill baseline major → MUST use version-specific query
+4. If library not in `versions.lock.md` → use version-specific query always
 
 **Do not use for:** HTML/CSS fundamentals, TypeScript language features, general algorithmic questions.
 

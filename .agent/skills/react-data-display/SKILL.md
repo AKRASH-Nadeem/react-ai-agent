@@ -1,4 +1,9 @@
+---
 name: react-data-display
+requires:
+  - "@tanstack/react-table@^8"
+  - "@tanstack/react-virtual@^3"
+  - recharts@^2
 description: |
   Use when the project needs data tables, charts, virtual lists, or data visualization.
   Trigger on: "data table", "table with sorting", "filterable table", "paginated table",
@@ -6,6 +11,12 @@ description: |
   "graph", "visualization", "Recharts", "D3", "virtual list", "virtualized",
   "10,000 rows", "large dataset", "empty state", "no results", "nothing here",
   "z-index", "stacking context", "date format", "date-fns", "relative time", "time ago".
+---
+> **Version check required** — before using any example in this skill:
+> `cat package.json | grep "recharts"` → if major differs from `requires:`, run the
+> **Version-Aware Skill Protocol** in `versions.lock.md` and query Context7 with your
+> installed version before writing code.
+
 ---
 
 > ⚠️ **Examples are version-anchored** to `versions.lock.md`. Verify method names and imports for the installed version via Context7 before use.

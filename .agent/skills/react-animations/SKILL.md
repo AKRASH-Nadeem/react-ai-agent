@@ -1,4 +1,7 @@
+---
 name: react-animations
+requires:
+  - motion@^11
 description: |
   Use when the user asks about animations, transitions, motion, or visual movement.
   Trigger on: "animation", "transition", "motion", "animate", "fade", "slide",
@@ -8,6 +11,12 @@ description: |
   "GSAP", "Lottie", "carousel", "modal open/close", "accordion",
   "prefers-reduced-motion", "View Transitions API",
   "CSS Scroll-Driven Animations", "scroll snap".
+---
+> **Version check required** — before using any example in this skill:
+> `cat package.json | grep "motion"` → if major differs from `requires:`, run the
+> **Version-Aware Skill Protocol** in `versions.lock.md` and query Context7 with your
+> installed version before writing code.
+
 ---
 
 > ⚠️ **Examples are version-anchored** to `versions.lock.md`. Verify method names and imports for the installed version via Context7 before use.

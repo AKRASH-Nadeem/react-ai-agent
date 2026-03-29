@@ -12,20 +12,83 @@ trigger: always_on
 
 ---
 
-## Pre-Task Protocol
+## Version-Aware Skill Protocol
 
-Run before any task that touches an external library:
+**This protocol fires automatically every time a skill activates.**
+It is not optional and not a "good idea" — it is the mechanism that prevents
+writing code that fails silently because the skill example was written for a
+different library version than what is installed.
+
+### Step 1 — Check installed versions for this skill's packages
+
+When a skill activates, immediately run:
 
 ```bash
-cat package.json | grep -E '"tailwindcss"|"shadcn"|"react"|"@tanstack|"motion"|"msw"'
+# Replace [package] with each package in the skill's requires: block
+cat package.json | grep "[package]"
 ```
 
-Compare each result against this file. For every library where:
-- **Installed version matches** → use skill examples as patterns, verify API via Context7
-- **Installed version differs** → call Context7 `[library] v[installed-version] [feature]` before writing anything
-- **Library not in this file** → treat as unknown, call Context7 unconditionally
+If the skill has no `requires:` block, still check `package.json` for any
+library the skill's examples reference before writing code.
 
-**Skill examples are patterns, not copy-paste.** They show structural intent. Always verify the exact method names and imports for the installed version via Context7 or shadcn MCP.
+### Step 2 — Compare against this file's baseline
+
+| Result | Action |
+|--------|--------|
+| Installed major **matches** baseline | Use skill examples as structural patterns. Still call Context7 to verify current API before writing code. |
+| Installed major **differs** from baseline | **STOP. Do not use skill examples.** Go to Step 3. |
+| Package **not installed** | Follow install-protocol.md IP2 — Context7 → install → ledger entry. |
+| Package **not in this file** | Treat as unknown version. Call Context7 unconditionally. |
+
+### Step 3 — Auto Context7 query (fires on version mismatch)
+
+When the installed major version differs from the baseline, query Context7
+using the installed version before writing a single line of code.
+
+**Query format — use the installed version, not the baseline:**
+
+```
+[library-name] v[INSTALLED_MAJOR] [specific feature being implemented]
+```
+
+**Examples by category:**
+
+| Installed version | Task | Context7 query to run |
+|-------------------|------|------------------------|
+| `@tanstack/react-query@4.x` | useQuery options | `tanstack react-query v4 useQuery options` |
+| `@tanstack/react-query@5.x` | mutations | `tanstack react-query v5 useMutation` |
+| `msw@1.x` | request handlers | `msw v1 request handlers rest` |
+| `msw@2.x` | request handlers | `msw v2 http handlers HttpResponse` |
+| `motion@11.x` | AnimatePresence | `motion react v11 AnimatePresence` |
+| `framer-motion@10.x` | AnimatePresence | `framer-motion v10 AnimatePresence` |
+| `tailwindcss@3.x` | config setup | `tailwindcss v3 config file setup` |
+| `tailwindcss@4.x` | config setup | `tailwindcss v4 css config import` |
+| `zustand@4.x` | create store | `zustand v4 create store typescript` |
+| `zustand@5.x` | create store | `zustand v5 create store typescript` |
+| `react-router-dom@6.x` | nested routes | `react router v6 nested routes` |
+| `react-router-dom@7.x` | nested routes | `react router v7 nested routes data router` |
+| `@sentry/react@7.x` | init setup | `sentry react v7 init BrowserTracing` |
+| `@sentry/react@8.x` | init setup | `sentry react v8 init setup` |
+
+**What to do with the Context7 result:**
+- The Context7 output IS the source of truth for the installed version
+- Skill example code shows the **pattern and structure** — what to build
+- Context7 shows the **exact API** — what method names, imports, options to use
+- If they conflict: Context7 wins. Always.
+
+### Step 4 — Write code using Context7 output, not skill example verbatim
+
+Skill examples are architectural blueprints. The actual code must use the
+API confirmed by Context7 for the installed version.
+
+```
+❌ Wrong: Copy skill example code directly, assume it matches installed version
+❌ Wrong: Use training memory for method names on a library with version mismatch
+✅ Right: Skill example → understand structure → Context7 for installed version → write code
+```
+
+**Skill examples are patterns, not copy-paste.** They show structural intent.
+Context7 provides the exact method names and imports for your installed version.
 
 ---
 
@@ -77,7 +140,7 @@ Compare each result against this file. For every library where:
 | Package | Baseline | Notes |
 |---------|----------|-------|
 | `@tanstack/react-query` | `^5.62.0` | v5 — breaking changes from v4 |
-| `axios` | `^1.7.0` | |
+| ~~`axios`~~ | BANNED — see tech-stack.md TS4. Use native `fetch` in `lib/api.ts` |
 | `zustand` | `^5.0.0` | |
 | `use-debounce` | `^10.0.0` | |
 

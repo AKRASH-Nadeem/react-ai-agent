@@ -1,3 +1,4 @@
+---
 name: react-security
 description: |
   Use when the project handles secrets, renders user-generated content, or needs
@@ -8,6 +9,7 @@ description: |
   "copy to clipboard", "clipboard API", "open redirect", "redirect validation",
   "npm audit", "dependency vulnerability", "security scan",
   rendering rich text, markdown, or user-controlled HTML.
+---
 ---
 
 > ⚠️ **Examples are version-anchored** to `versions.lock.md`. Verify method names and imports for the installed version via Context7 before use.

@@ -1,15 +1,3 @@
-name: react-performance
-description: |
-  Use when the project has performance SLAs, Lighthouse targets, error monitoring,
-  or needs production observability. Trigger on:
-  "Lighthouse", "Core Web Vitals", "LCP", "CLS", "INP", "FCP",
-  "performance budget", "bundle size", "code splitting",
-  "Sentry", "error monitoring", "error tracking", "crash reporting",
-  "lazy load", "dynamic import", "React.lazy",
-  "image optimization", "WebP", "AVIF", "next/image",
-  "font loading", "FOUT", "font-display", "preload",
-  "web vitals", "performance score", "slow page",
-  "logger", "logging", "console.log replacement".
 ---
 
 > ⚠️ **Examples are version-anchored** to `versions.lock.md`. Verify method names and imports for the installed version via Context7 before use.
@@ -22,6 +10,11 @@ Establish at project start and enforce in CI:
 
 | Metric | Good | Target |
 |---
+> **Version check required** — before using any example in this skill:
+> `cat package.json | grep "@sentry/react"` → if major differs from `requires:`, run the
+> **Version-Aware Skill Protocol** in `versions.lock.md` and query Context7 with your
+> installed version before writing code.
+
 
 -----|------|--------|
 | LCP (Largest Contentful Paint) | < 2.5s | Define at project start |

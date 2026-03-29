@@ -2,7 +2,7 @@
 trigger: always_on
 ---
 
-> SYSTEM CONTEXT: You are a senior React TypeScript engineer and UI/UX technician. Apply these standards exactly from the first file to the last. Non-negotiable unless the user explicitly overrides one.
+> SYSTEM CONTEXT: You are a Principal React TypeScript Engineer and Accessibility-First UI/UX technician. Apply these standards exactly from the first file to the last. Non-negotiable unless the user explicitly overrides one.
 >
 > **Mandatory skills — load before every UI task, no exceptions:** `react-tailwind` + `react-shadcn`. These are not optional and do not require a trigger.
 >
@@ -11,16 +11,50 @@ trigger: always_on
 > MCP: Call Context7 before writing any code that touches a library or framework. Never generate library code from memory.
 >
 > **Import verification — mandatory after every code writing task:**
-> 1. For every `from '@/components/ui/X'` import: confirm `src/components/ui/X.tsx` physically exists — `ls src/components/ui/ | grep X`
-> 2. For every `from 'some-package'` import: confirm the package is in `package.json` — `cat package.json | grep some-package`
+> 1. Confirm every `@/components/ui/X` import: `ls src/components/ui/ | grep X`
+> 2. Confirm every package import: `cat package.json | grep package-name`
 > 3. Run `npx tsc --noEmit` — zero errors required
-> 4. If any import resolves to a missing file: stop, install the missing component or package, fix the import, re-verify. Never report task complete with unresolved imports.
+> 4. Missing import → stop, fix, re-verify. Never report done with unresolved imports.
 
 ---
 
-## 0. Design-First Mandate
+## 0.A. Accessibility-First Mandate (overrides all other aesthetic decisions)
 
-Before writing JSX: (1) What problem does this UI solve and who uses it? (2) What is the tone — commit to one direction. (3) What is the one thing a user will remember? Apply `design-philosophy.md` for all visual decisions.
+**Accessibility is the baseline. Never traded for beauty. When they conflict: accessibility wins.**
+
+Priority order: Functional → Accessible → Performant → Maintainable → Beautiful.
+
+**Always applied — no trigger required:**
+- Keyboard-navigable and focusable interactive elements
+- Semantic HTML only: `<button>`, `<nav>`, `<main>`. Never `<div onClick>`
+- Every `<img>` needs `alt` or `alt=""` if decorative
+- Color never the only status indicator — pair with text or shape
+- Min 4.5:1 contrast for text, 3:1 for large text
+- Touch targets min 44×44px (`min-h-11 min-w-11`)
+- `prefers-reduced-motion` respected on every animation
+- Focus rings always visible — never `outline: none` without a replacement
+
+Advanced a11y (WCAG 2.2, focus traps, live regions, ARIA) → **`react-accessibility` skill**.
+
+---
+
+## 0.B. Design-First Mandate
+
+After confirming accessibility requirements are met, before writing JSX:
+1. What problem does this UI solve and who uses it?
+2. What is the tone — commit to one direction
+3. What is the one thing a user will remember?
+
+Apply `design-philosophy.md` for all visual decisions — subject to the precedence hierarchy in §0.A.
+
+---
+
+## 0.C. Tech Stack & Project Context
+
+Before writing any code on a new project or adding any new library:
+- New project → follow `tech-stack.md` TS1 (proposal → approval → lock)
+- New library → follow `tech-stack.md` TS2 (checklist → reasoning → approval)
+- Session start → establish context per `project-context.md` PC1
 
 ---
 
@@ -29,7 +63,7 @@ Before writing JSX: (1) What problem does this UI solve and who uses it? (2) Wha
 - Always TypeScript `.tsx` / `.ts`. Never plain JavaScript.
 - Target React 19+ with React Compiler enabled.
 - Never manually write `useMemo`, `useCallback`, or `React.memo` — the compiler handles this.
-- ES Modules only. Never `require()`.
+- ES Modules only. Never `require()`
 - `"strict": true` in tsconfig. Never `any` — use `unknown` and narrow, or generics.
 
 ---
@@ -56,8 +90,9 @@ One component per file, PascalCase filename. Barrel `index.ts` for public featur
 - Props defined with `type` alias. Prefer `type` over `interface` for props.
 - Named exports everywhere. Default exports only when a framework requires it.
 - Destructure props in the function signature. Never access `props.x` in the body.
-- Never inline anonymous functions in JSX for complex logic — extract named handlers.
+- Never inline anonymous functions in JSX for complex logic — extract to named handlers.
 - One component = one job. Extract state/effect logic into custom hooks when it grows.
+- Component design patterns (compound components, slots, render props) → `react-component-patterns` skill.
 
 ---
 
@@ -68,7 +103,7 @@ One component per file, PascalCase filename. Barrel `index.ts` for public featur
 - Discriminated unions for state: `{ status: "idle" } | { status: "loading" } | { status: "success"; data: T } | { status: "error"; error: string }`
 - Always type return values explicitly for exported functions and hooks.
 - Use `satisfies` for config validation without widening. `as const` for literal tuples.
-- Never non-null assertion `!` unless structurally impossible — comment why.
+- Never non-null assertion `!` unless structurally impossible.
 - Always path aliases `@/` for all imports within the project.
 - Never any relative imports — not `../`, not `../../`, not any depth.
 - The only exception is importing a file from its own directory: `./types` inside the same feature folder is acceptable.
@@ -90,20 +125,13 @@ One component per file, PascalCase filename. Barrel `index.ts` for public featur
 | Situation | Tool |
 |---|---|
 | Two-dimensional (sidebar + main) | CSS Grid |
-| One-dimensional row or column | Flexbox |
-| Repeating same-size tiles | CSS Grid `auto-fill` |
-| Component in multiple layout contexts | `@container` — **react-modern-css** skill |
+| One-dimensional | Flexbox |
+| Repeating tiles | CSS Grid `auto-fill` |
+| Component in multiple contexts | `@container` — **react-modern-css** |
 
-Shell pattern:
-```tsx
-<div className="grid h-screen grid-cols-[240px_1fr] grid-rows-[auto_1fr]">
-  <header className="col-span-2" />
-  <nav />
-  <main />
-</div>
-```
+Shell: `grid h-screen grid-cols-[240px_1fr] grid-rows-[auto_1fr]` with `col-span-2` header.
 
-Never: margin stacks for page structure, `position: absolute` for layout, nested flex > 2 levels, `w-full h-full` without explicit parent size. Responsive: apply breakpoints on the grid parent. Spacing scale: inline `px-4 md:px-6`, card `p-4 md:p-6`, row `gap-2`–`gap-4`, section `space-y-6`–`space-y-12`.
+Never: margin stacks, `absolute` for layout, nested flex >2 levels. Responsive breakpoints on grid parent only. Spacing: inline `px-4`, card `p-4`, row `gap-2`–`gap-4`, section `space-y-6`–`space-y-12`.
 
 ---
 
@@ -134,6 +162,7 @@ All shadcn standards, version detection, component install patterns, and Field v
 - Feature-shared state: lift or React Context with a custom provider hook.
 - URL state for anything surviving refresh or shareable (filters, pagination, tabs) — use `nuqs`.
 - Global state beyond Context: Zustand. Never store derived data in state.
+- Full library selection reasoning → `tech-stack.md` TS2.2.
 
 ---
 
@@ -162,6 +191,7 @@ All shadcn standards, version detection, component install patterns, and Field v
 - Never silently swallow errors. Always log or display feedback.
 - `sonner` for toasts (success, error, info).
 - Full diagnosis and fix protocols → **react-error-handling** skill.
+- Systematic debugging methodology → **react-troubleshooting** skill.
 
 ---
 
@@ -174,13 +204,10 @@ All shadcn standards, version detection, component install patterns, and Field v
 
 ---
 
-## 15. Accessibility — Baseline
+## 15. Accessibility — Full Standards
 
-- All interactive elements keyboard-navigable and focusable.
-- Semantic HTML always: `<button>`, `<nav>`, `<main>`. Never `<div onClick>`.
-- Every `<img>` needs `alt`, or `alt=""` if decorative. Color must never be the only status cue.
-- Min 4.5:1 contrast. Touch targets min 44×44px (`min-h-11 min-w-11`).
-- WCAG 2.2, focus traps, aria-live, automated a11y testing → **react-accessibility** skill.
+See §0.A — the accessibility mandate is defined there and applies to all work.
+Advanced patterns (WCAG 2.2, focus traps, aria-live, automated testing) → **react-accessibility** skill.
 
 ---
 
@@ -216,7 +243,7 @@ Test behavior, not implementation.
 ## 19. Code Quality
 
 - ESLint `@typescript-eslint/recommended` + `eslint-plugin-react-hooks`. Prettier auto-format.
-- No commented-out code. No `console.log` in commits — use the project logger.
+- No commented-out code. No `console.log` in commits — use the logger.
 - Meaningful names only. Never `data`, `res`, `temp`, `obj`, `x`.
 - Early returns to reduce nesting. `const` over `let`. Never `var`.
 - Pure utility functions in `utils.ts` — no side effects.
@@ -235,11 +262,9 @@ Test behavior, not implementation.
 
 ## 21. MCP Usage Rules
 
-- **Context7**: Call before any library or framework code. Never use training memory for React, Next.js, Tailwind, TanStack, shadcn, or any npm package API.
-- **shadcn MCP**: Call `get-component [name]` before using any shadcn component — confirms what is available in the installed registry. Required for: `field`, `form`, `input-otp`, `sidebar`, `calendar`, `chart`.
-- **Figma**: When a design file is provided, read tokens/layout from Figma MCP before writing component code.
-- **Magic UI**: For animated components and special effects, check Magic UI MCP before building from scratch.
-- **Fetch**: For any referenced URL or changelog, fetch the live page — never summarize from memory.
+Full MCP priority order, per-tool mandates, and usage patterns → **`mcp-servers.md`** (always-on rule).
+
+**Non-negotiable summary**: Context7 before any library code. shadcn MCP before any shadcn component. Never training memory for npm APIs.
 
 ---
 
@@ -250,13 +275,12 @@ Test behavior, not implementation.
 - Never mix `cn()` and template literals. Never mix `interface`/`type` for the same purpose in one feature.
 - Handler names consistent: `handleSubmit` not `onSubmit` for the same pattern.
 - `// TODO(#123): description` only — never `// TODO: fix later`.
+- Library selection → `tech-stack.md`. Never add a dependency without the TS2 checklist.
+
+---
 
 ## 23. Incremental Implementation
 
-When a task has 3+ features or routes:
-1. List the implementation sequence before writing any code — get confirmation
-2. Implement one feature at a time in dependency order (foundation first)
-3. After each feature: run import verification (§0 header) + `npx tsc --noEmit`
-4. Only move to the next feature after the current one passes verification
-5. Commit each completed feature before starting the next — **react-git-workflow** skill
-6. Never implement feature N+1 against unverified feature N code
+Full protocol → **`project-context.md`** (always-on rule). Never build N+1 on unverified N.
+
+Gates before any feature is complete: `tsc --noEmit` zero errors → imports resolve → all UI states → §0.A accessibility → zero console noise → `npm run build` clean.

@@ -1,4 +1,8 @@
+---
 name: react-rest-advanced
+requires:
+  - "@tanstack/react-query@^5"
+  - zod@^3
 description: |
   Use when the project uses REST APIs beyond basic CRUD. Trigger on:
   "token refresh", "401", "interceptor", "auth header", "Bearer token",
@@ -9,6 +13,12 @@ description: |
   "environment variable", "VITE_", ".env", "env validation",
   "axios instance", "request interceptor", "cache invalidation",
   "staleTime", "parallel queries", "sequential requests".
+---
+> **Version check required** — before using any example in this skill:
+> `cat package.json | grep "zod"` → if major differs from `requires:`, run the
+> **Version-Aware Skill Protocol** in `versions.lock.md` and query Context7 with your
+> installed version before writing code.
+
 ---
 
 > ⚠️ **Examples are version-anchored** to `versions.lock.md`. Verify method names and imports for the installed version via Context7 before use.

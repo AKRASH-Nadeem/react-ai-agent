@@ -1,13 +1,3 @@
-name: react-testing
-description: |
-  Use when the user needs to write, configure, or improve tests for a React TypeScript project.
-  Trigger on: "test", "testing", "unit test", "component test", "integration test",
-  "E2E", "end-to-end", "Playwright", "Cypress", "Vitest", "Jest",
-  "React Testing Library", "RTL", "MSW", "mock server", "mock API",
-  "jest-axe", "accessibility test", "test setup", "test config",
-  "test coverage", "vitest.config", "playwright.config",
-  "renderHook", "userEvent", "waitFor", "screen.getBy*", "screen.findBy*",
-  "snapshot test" (to redirect to RTL), "how do I test", "write a test for".
 ---
 
 > ⚠️ **Examples are version-anchored** to `versions.lock.md`. Verify method names and imports for the installed version via Context7 before use.
@@ -18,6 +8,11 @@ description: |
 
 | Layer | Tool |
 |---
+> **Version check required** — before using any example in this skill:
+> `cat package.json | grep "vitest"` → if major differs from `requires:`, run the
+> **Version-Aware Skill Protocol** in `versions.lock.md` and query Context7 with your
+> installed version before writing code.
+
 
 ----|------|
 | Unit (utilities, hooks) | Vitest |

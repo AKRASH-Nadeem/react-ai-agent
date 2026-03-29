@@ -1,3 +1,4 @@
+---
 name: react-accessibility
 description: |
   Use when the project targets WCAG 2.2 compliance, custom interactive widgets,
@@ -9,6 +10,7 @@ description: |
   "axe", "automated accessibility", "jest-axe",
   "prefers-reduced-motion", "reduced motion",
   accessibility for charts, drag-and-drop, data tables, or custom widgets.
+---
 ---
 
 > ⚠️ **Examples are version-anchored** to `versions.lock.md`. Verify method names and imports for the installed version via Context7 before use.

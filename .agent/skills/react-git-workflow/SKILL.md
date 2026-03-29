@@ -127,7 +127,7 @@ When reviewing code, ask: "Can this commit be reverted cleanly without affecting
 
 ## GIT4. `.gitignore` Template
 
-Use `examples/gitignore.template` in the **react-project-init** skill as the base. Always create `.gitignore` before the first `git add`. Critical rules:
+Use `examples/commitlint.config.cjs` in the **react-project-init** skill as the base. Always create `.gitignore` before the first `git add`. Critical rules:
 
 - Never commit `.env` — commit `.env.example` instead
 - Never commit `node_modules/`, `dist/`, `.next/`
