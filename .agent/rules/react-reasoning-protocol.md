@@ -179,27 +179,77 @@ Rules:
 
 ---
 
-## Phase 5 — Self-Invalidation (React-Specific Questions)
+## Phase 5 — Failure Scenario Inventory (before writing code)
 
-Before committing to an implementation, ask:
+After choosing an approach, run this inventory before writing any
+implementation. Each question must be answered for THIS specific
+feature — not generically, but naming the specific component,
+hook, user action, and outcome.
 
-1. "Will this break if the user navigates away mid-operation?"
-   → If yes: cancel in-flight requests, clean up effects.
+**Connection failure:** What does the user see if every API call
+this feature makes fails, is slow, or is interrupted mid-flight?
+Walk through each network call. Name the specific UI state at each
+failure point. If any answer is "a spinner that never resolves" or
+"a broken page", the implementation needs a defence before it is written.
 
-2. "Will this cause a flash of unstyled/incomplete content?"
-   → If yes: coordinate loading states, use Suspense boundaries.
+**Request race:** What if multiple in-flight requests for this feature
+complete in the wrong order, or a response arrives after the component
+unmounts? Name the specific stale data or state-update-on-unmounted-
+component that results. If an answer exists, the implementation needs
+cancellation, debouncing, or an `isMounted` guard.
 
-3. "Will this cause unnecessary re-renders?"
-   → Profile with React DevTools before deciding, not after.
+**Session boundary:** What if the user's session expires or their
+permissions change mid-interaction? Name the specific action they are
+taking and what happens when a 401 arrives during it. A form that takes
+3 minutes can outlive a token. The implementation must handle this
+gracefully, not crash.
 
-4. "What happens if the API returns an unexpected shape?"
-   → Zod `.safeParse()` on every response. Never trust raw types.
+**Empty and zero:** What does every data-dependent view look like
+when the API returns an empty array, a zero count, or null where an
+object is expected? Name the specific empty states. If any are the
+same as the loading state or show nothing, the feature has a missing
+design requirement, not just a missing test.
 
-5. "What happens in slow network conditions?"
-   → Test with Chrome throttling. Is the loading state clear?
+**Double action:** What if the user triggers the primary action twice
+before the first response arrives? Name the specific duplicate outcome
+(duplicate record, double submission, double navigation). If any answer
+is "undefined behaviour", the implementation needs a disabled state
+or idempotency guard.
 
-6. "What happens if localStorage/sessionStorage is unavailable?"
-   → Private browsing, storage full, security restrictions. Always try/catch.
+**Browser environment:** What if any browser API this feature uses
+is unavailable? Name each browser API call (localStorage, clipboard,
+share, intersection observer, matchMedia). For each one, name the
+failure mode when it is unavailable. If any is unguarded, the
+implementation is incomplete.
+
+**Accessibility path:** What breaks for a user who is not using a
+mouse? Walk through the feature using only a keyboard. Name every
+interactive element that cannot be reached or triggered by keyboard.
+Name every dynamic state change that is not announced to a screen
+reader. These are failures of the feature, not optional enhancements.
+
+**Outcome of this phase:**
+Each question that surfaces a named failure scenario is a test
+obligation. Track them explicitly before writing implementation code.
+Apply `react-edge-case-testing` skill for the full thinking loop
+and test verification process.
+
+## Phase 6 — Connect Failures to Tests
+
+The failure scenarios from Phase 5 are not design notes. Before
+implementation is complete:
+
+For each failure scenario identified in Phase 5, either:
+- Name the MSW handler configuration and assertion that proves
+  the defence holds, OR
+- Explain architecturally why this scenario cannot occur
+
+A feature with failure scenarios and no corresponding tests is
+incomplete. Tests that do not correspond to a named failure scenario
+are coverage noise.
+
+The four required states (loading, error, empty, success) are the
+minimum. The adversarial questions surface what goes beyond them.
 
 ---
 

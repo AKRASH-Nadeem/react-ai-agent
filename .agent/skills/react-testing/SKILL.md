@@ -4,6 +4,12 @@
 
 # Testing Standards
 
+> **Works with `react-edge-case-testing` skill.** This skill covers
+> test setup, Vitest config, MSW setup, RTL patterns, and Playwright.
+> `react-edge-case-testing` covers what to test and how to reason
+> about failure scenarios. Both apply on every feature.
+
+
 ## TEST1. Stack
 
 | Layer | Tool |
