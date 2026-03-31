@@ -8,7 +8,7 @@ trigger: always_on
 # Before applying any skill example, compare these versions against
 # what is installed: cat package.json | grep "package-name"
 #
-# Last updated: 2025-01
+# Last updated: 2026-03
 
 ---
 
