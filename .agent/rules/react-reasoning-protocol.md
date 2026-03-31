@@ -17,9 +17,9 @@ DECISION 1: Read before building (same as Django protocol)
   Invalidated: Agent introduces a new pattern (e.g., a new error boundary
                shape) that conflicts with the one already in the codebase.
                Three sessions later there are two incompatible patterns.
-  Solution: Check LIBRARY_LEDGER.md and existing code patterns FIRST.
-            Reuse what exists. Introduce new patterns only when existing
-            ones genuinely cannot serve.
+  Solution: Check LIBRARY_LEDGER.md, DECISION_LOG.md, and existing code
+            patterns FIRST. Reuse what exists. Introduce new patterns only
+            when existing ones genuinely cannot serve.
 
 DECISION 2: Bundle impact check is mandatory, not optional
   Initial: tech-stack.md already has the 20KB rule — no need to repeat
@@ -50,6 +50,18 @@ DECISION 4: "Ask the user" threshold
             new pattern would conflict with an existing one, or (3) the
             implementation requires infrastructure the agent can't confirm
             exists (new API endpoint, new auth scope, new env var).
+
+DECISION 5: Architectural decisions must be remembered across sessions
+  Initial: Agent reads LIBRARY_LEDGER.md to understand what's installed
+  Invalidated: LIBRARY_LEDGER.md captures packages and env vars, not
+               architectural reasoning. The agent has no memory of WHY
+               a pattern was chosen or what was rejected. Without this,
+               the agent can't push back intelligently when a request
+               conflicts with a prior decision — it has no prior decision
+               to reference.
+  Solution: DECISION_LOG.md created and maintained per senior-dev-mindset.md.
+            Phase 0 (Requirement Interrogation) added before Phase 1.
+            Phase 1 now includes reading DECISION_LOG.md.
 ```
 
 ---
@@ -71,16 +83,38 @@ SKIP (just build it well):
 
 ---
 
+## Phase 0 — Interrogate the Requirement
+
+> Defined fully in `senior-dev-mindset.md`. Summary:
+> Before reasoning about *how* to implement, ask whether *this* is the right solution
+> to the actual problem. Requirements are hypotheses, not specifications.
+
+Apply the Three Questions from `senior-dev-mindset.md`:
+1. What is the actual problem (stripped of the stated solution)?
+2. What assumption is embedded in this request?
+3. Is the implementation complexity proportional to the problem?
+
+Check the Frontend Requirement Smells table in `senior-dev-mindset.md`.
+If a smell matches, raise the concern with the CONCERN / ASSUMPTION / ALTERNATIVE / QUESTION format
+before proceeding to Phase 1.
+
+If no concern surfaces: proceed directly to Phase 1.
+
+---
+
 ## Phase 1 — Read Before Building
 
 Before writing any code, check in this order:
 
-1. **LIBRARY_LEDGER.md** — what is installed? what versions? what was rejected?
-2. **Existing components** — does a similar component already exist?
+1. **DECISION_LOG.md** — what architectural decisions were made, why, and what would reverse them?
+   If a new request conflicts with a logged decision, flag it before proceeding.
+   See `senior-dev-mindset.md` for the conflict flag format.
+2. **LIBRARY_LEDGER.md** — what is installed? what versions? what was rejected?
+3. **Existing components** — does a similar component already exist?
    `ls src/features/ | grep [feature-name]` — if yes, follow its pattern.
-3. **Existing hooks** — does a similar hook exist?
+4. **Existing hooks** — does a similar hook exist?
    `ls src/hooks/` and `ls src/features/*/` — don't create a duplicate.
-4. **lib/env.ts** — what env vars are configured?
+5. **lib/env.ts** — what env vars are configured?
    Does the feature need one that isn't there yet?
 
 Only build something new after confirming it doesn't already exist.
@@ -234,6 +268,8 @@ obligation. Track them explicitly before writing implementation code.
 Apply `react-edge-case-testing` skill for the full thinking loop
 and test verification process.
 
+---
+
 ## Phase 6 — Connect Failures to Tests
 
 The failure scenarios from Phase 5 are not design notes. Before
@@ -250,6 +286,17 @@ are coverage noise.
 
 The four required states (loading, error, empty, success) are the
 minimum. The adversarial questions surface what goes beyond them.
+
+---
+
+## Phase 7 — Update DECISION_LOG.md
+
+If this task produced a new architectural decision (a library chosen,
+a pattern established, a constraint surfaced, a prior approach rejected),
+update DECISION_LOG.md.
+
+Replace changed entries — do not append.
+If no architectural decision was made, skip this phase.
 
 ---
 
@@ -275,3 +322,12 @@ minimum. The adversarial questions surface what goes beyond them.
 
 ❌ Asking the user about a decision with a clear professional answer
    → Phase 3 clear winner test catches it
+
+❌ Accepting a requirement that solves the wrong problem
+   → Phase 0 interrogation catches it
+
+❌ Reversing an architectural decision without noticing it conflicts with a prior one
+   → Phase 1 DECISION_LOG.md read catches it
+
+❌ Making an architectural choice that can't be explained to a future session
+   → Phase 7 DECISION_LOG.md update prevents it
