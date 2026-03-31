@@ -9,85 +9,29 @@ trigger: always_on
 
 ---
 
-## Reasoning & Invalidation Log
+## When to Apply
 
-```
-DECISION 1: Read before building (same as Django protocol)
-  Initial: Agent builds from task description alone
-  Invalidated: Agent introduces a new pattern (e.g., a new error boundary
-               shape) that conflicts with the one already in the codebase.
-               Three sessions later there are two incompatible patterns.
-  Solution: Check LIBRARY_LEDGER.md, DECISION_LOG.md, and existing code
-            patterns FIRST. Reuse what exists. Introduce new patterns only
-            when existing ones genuinely cannot serve.
-
-DECISION 2: Bundle impact check is mandatory, not optional
-  Initial: tech-stack.md already has the 20KB rule — no need to repeat
-  Invalidated: tech-stack.md gates library ADDITIONS. But bundle impact
-               also applies to HOW something is used: barrel imports,
-               non-tree-shaken patterns, loading all icons. The reasoning
-               protocol catches usage patterns, not just install decisions.
-  Solution: Reasoning protocol includes a bundle usage check, separate
-            from the library addition check in tech-stack.md.
-
-DECISION 3: React Compiler compatibility is a constraint category
-  Initial: Covered by tech-stack.md TS2.1
-  Invalidated: TS2.1 is about library selection. But existing code can
-               also break Compiler: manual useMemo/useCallback calls,
-               mutable objects in props, certain ref patterns. The agent
-               needs to check Compiler compatibility when WRITING code,
-               not just when SELECTING libraries.
-  Solution: Compiler compat is a constraint in the implementation
-            reasoning, not just the library selection reasoning.
-
-DECISION 4: "Ask the user" threshold
-  Initial: Ask whenever uncertain
-  Invalidated: Asking on every decision creates noise. Developers stop
-               reading the questions. The real threshold is: when would
-               two different developers reasonably make different choices
-               that they'd both have to live with long-term?
-  Solution: Ask only when: (1) bundle impact >20KB gzipped, or (2) a
-            new pattern would conflict with an existing one, or (3) the
-            implementation requires infrastructure the agent can't confirm
-            exists (new API endpoint, new auth scope, new env var).
-
-DECISION 5: Architectural decisions must be remembered across sessions
-  Initial: Agent reads LIBRARY_LEDGER.md to understand what's installed
-  Invalidated: LIBRARY_LEDGER.md captures packages and env vars, not
-               architectural reasoning. The agent has no memory of WHY
-               a pattern was chosen or what was rejected. Without this,
-               the agent can't push back intelligently when a request
-               conflicts with a prior decision — it has no prior decision
-               to reference.
-  Solution: DECISION_LOG.md created and maintained per senior-dev-mindset.md.
-            Phase 0 (Requirement Interrogation) added before Phase 1.
-            Phase 1 now includes reading DECISION_LOG.md.
-```
-
----
-
-## When to Apply This Protocol
-
-ALWAYS apply before:
+**ALWAYS apply before:**
 - Choosing between two valid implementation approaches
-- Adding any new UI pattern that doesn't exist in the codebase yet
+- Adding any new UI pattern not already in the codebase
 - Any feature with performance implications (virtualization, lazy loading, SSE)
 - Any feature that introduces a new global state shape
 - Any form or interaction with complex validation or conditional logic
 
-SKIP (just build it well):
-- Adding a new field to an existing form
-- Writing a new page that follows the exact pattern of an existing page
-- Fixing a bug with a clear, isolated cause
-- Styling changes within an existing component
+**SKIP only for:**
+- Adding a new field to an existing form that exactly mirrors another field
+- A new page that is an exact structural copy of an existing page
+- A bug with a single-line, isolated fix
+- Style or copy changes within an existing component
+
+**When in doubt: apply it.** Skipping costs more than applying.
 
 ---
 
 ## Phase 0 — Interrogate the Requirement
 
-> Defined fully in `senior-dev-mindset.md`. Summary:
-> Before reasoning about *how* to implement, ask whether *this* is the right solution
-> to the actual problem. Requirements are hypotheses, not specifications.
+> Defined in `senior-dev-mindset.md`. Summary:
+> Before reasoning about *how* to implement, ask whether *this* is the right solution.
 
 Apply the Three Questions from `senior-dev-mindset.md`:
 1. What is the actual problem (stripped of the stated solution)?
@@ -95,10 +39,7 @@ Apply the Three Questions from `senior-dev-mindset.md`:
 3. Is the implementation complexity proportional to the problem?
 
 Check the Frontend Requirement Smells table in `senior-dev-mindset.md`.
-If a smell matches, raise the concern with the CONCERN / ASSUMPTION / ALTERNATIVE / QUESTION format
-before proceeding to Phase 1.
-
-If no concern surfaces: proceed directly to Phase 1.
+If a smell matches, raise the concern before proceeding to Phase 1.
 
 ---
 
@@ -106,60 +47,41 @@ If no concern surfaces: proceed directly to Phase 1.
 
 Before writing any code, check in this order:
 
-1. **DECISION_LOG.md** — what architectural decisions were made, why, and what would reverse them?
-   If a new request conflicts with a logged decision, flag it before proceeding.
-   See `senior-dev-mindset.md` for the conflict flag format.
+1. **DECISION_LOG.md** — what architectural decisions were made, why, and what would reverse them? If a new request conflicts with a logged decision, flag it before proceeding.
 2. **LIBRARY_LEDGER.md** — what is installed? what versions? what was rejected?
-3. **Existing components** — does a similar component already exist?
-   `ls src/features/ | grep [feature-name]` — if yes, follow its pattern.
-4. **Existing hooks** — does a similar hook exist?
-   `ls src/hooks/` and `ls src/features/*/` — don't create a duplicate.
-5. **lib/env.ts** — what env vars are configured?
-   Does the feature need one that isn't there yet?
+3. **Existing components** — does a similar component already exist? `ls src/features/ | grep [feature-name]`
+4. **Existing hooks** — does a similar hook exist? `ls src/hooks/` and `ls src/features/*/`
+5. **lib/env.ts** — what env vars are configured? Does the feature need one that isn't there?
 
-Only build something new after confirming it doesn't already exist.
-If it partially exists, extend it rather than create a parallel pattern.
+Only build something new after confirming it doesn't already exist. If it partially exists, extend rather than create a parallel pattern.
 
 ---
 
 ## Phase 2 — Frontend Constraint Inventory
 
-For each non-trivial decision, work through these constraints:
-
 **Bundle impact:**
-- Does this add a new package? → bundlephobia check (>20KB gzipped = ask)
-- Does this use named imports only? → barrel imports bloat the bundle
-- Does this code-split at the route level? → heavy features need `React.lazy`
-- Does this load synchronously on the initial render? → should it be deferred?
+- New package? → bundlephobia check (>20KB gzipped = ask)
+- Named imports only? → barrel imports bloat the bundle
+- Code-split at route level? → heavy features need `React.lazy`
 
 **React Compiler compatibility:**
-- Does this manually write `useMemo`, `useCallback`, or `React.memo`?
-  → Remove them. The compiler handles this. Manual memoization fights the compiler.
-- Does this mutate props or state objects in place?
-  → Never. The compiler assumes immutability.
-- Does this depend on a library that manually manages re-renders?
-  → Flag it. May conflict with the compiler.
+- Manual `useMemo`, `useCallback`, or `React.memo`? → Remove them. The compiler handles this.
+- Mutating props or state in place? → Never. The compiler assumes immutability.
 
 **Accessibility impact:**
-- Does this change focus management? → keyboard users must not get lost
-- Does this hide/show content? → `aria-hidden`, `aria-expanded` needed
-- Does this trigger a dynamic change? → `aria-live` region needed
-- Does this add a new interactive pattern? → check **react-accessibility** skill
+- Changes focus management? → keyboard users must not get lost
+- Hides/shows content? → `aria-hidden`, `aria-expanded` needed
+- Triggers a dynamic change? → `aria-live` region needed
 
 **Loading and state budget:**
-- How many loading states will the user see at once?
-  → Multiple concurrent spinners = worse UX than one coordinated skeleton
-- Does this need an empty state, error state, and success state?
-  → All three must be implemented. Missing states = incomplete feature.
-- Does this show stale data while refreshing?
-  → Document the stale-while-revalidate behavior in a comment.
+- Multiple concurrent spinners? → worse UX than one coordinated skeleton
+- Empty state, error state, and success state? → all three must be implemented
+- Stale data while refreshing? → document the behaviour in a comment
 
 **Browser compatibility:**
-- Does this use a CSS feature not widely supported? → check caniuse first
-- Does this use a Web API (Clipboard, Share, Notification)?
-  → Needs a feature detection fallback for Safari
-- Does this use a CSS animation that needs `prefers-reduced-motion`?
-  → Wrap every decorative animation
+- CSS feature not widely supported? → check caniuse first
+- Web API (Clipboard, Share, Notification)? → needs feature detection fallback for Safari
+- CSS animation? → wrap with `prefers-reduced-motion`
 
 ---
 
@@ -167,18 +89,15 @@ For each non-trivial decision, work through these constraints:
 
 Is one approach clearly better given the known constraints?
 
-YES → build it, state why in one sentence.
-Do not present options when there is a professional standard answer.
+**YES → build it**, state why in one sentence. Do not present options when there is a professional standard answer.
 
-Genuine trade-off exists when:
+A genuine trade-off exists when:
 - Two approaches have meaningfully different bundle impacts (>5KB delta)
-- Two approaches require different global state shapes (harder to change later)
+- Two approaches require different global state shapes
 - The right choice depends on whether the developer plans to extend this feature
 - One approach requires a new library and the other doesn't
 
-**Small team rule**: For teams of 1–3 developers, prefer the approach with
-lower cognitive overhead and simpler debugging — even if a more powerful
-pattern exists. The maintenance cost of clever patterns outweighs their benefits.
+**Small team rule**: For 1–3 developers, prefer the approach with lower cognitive overhead — even if a more powerful pattern exists.
 
 ---
 
@@ -204,130 +123,57 @@ MY RECOMMENDATION: [A or B] because [one concrete reason].
 Which would you like?
 ```
 
-Rules:
-- Maximum 2 options. More = decision paralysis.
-- Always give a recommendation. Never "it depends."
-- If bundle impact is the deciding factor, state the exact KB difference.
-- If accessibility is the deciding factor, the accessible option wins —
-  this is not a trade-off to present. Apply it without asking.
+Max 2 options. Always give a recommendation. If accessibility is the deciding factor, the accessible option wins — this is not a trade-off to present.
 
 ---
 
 ## Phase 5 — Failure Scenario Inventory (before writing code)
 
-After choosing an approach, run this inventory before writing any
-implementation. Each question must be answered for THIS specific
-feature — not generically, but naming the specific component,
-hook, user action, and outcome.
+For each question, name the specific component, hook, user action, and outcome for THIS feature — not generically.
 
-**Connection failure:** What does the user see if every API call
-this feature makes fails, is slow, or is interrupted mid-flight?
-Walk through each network call. Name the specific UI state at each
-failure point. If any answer is "a spinner that never resolves" or
-"a broken page", the implementation needs a defence before it is written.
+**Connection failure** — What does the user see if every API call fails, is slow, or is interrupted? Walk through each network call. Any "spinner that never resolves" means the implementation needs a defence.
 
-**Request race:** What if multiple in-flight requests for this feature
-complete in the wrong order, or a response arrives after the component
-unmounts? Name the specific stale data or state-update-on-unmounted-
-component that results. If an answer exists, the implementation needs
-cancellation, debouncing, or an `isMounted` guard.
+**Request race** — What if multiple in-flight requests complete in the wrong order, or a response arrives after the component unmounts? If an answer exists, add cancellation, debouncing, or an `isMounted` guard.
 
-**Session boundary:** What if the user's session expires or their
-permissions change mid-interaction? Name the specific action they are
-taking and what happens when a 401 arrives during it. A form that takes
-3 minutes can outlive a token. The implementation must handle this
-gracefully, not crash.
+**Session boundary** — What if the user's session expires or permissions change mid-interaction? A form that takes 3 minutes can outlive a token. Name what happens when a 401 arrives.
 
-**Empty and zero:** What does every data-dependent view look like
-when the API returns an empty array, a zero count, or null where an
-object is expected? Name the specific empty states. If any are the
-same as the loading state or show nothing, the feature has a missing
-design requirement, not just a missing test.
+**Empty and zero** — What does every data-dependent view look like when the API returns an empty array, zero count, or null? Any state identical to the loading state means a missing design requirement.
 
-**Double action:** What if the user triggers the primary action twice
-before the first response arrives? Name the specific duplicate outcome
-(duplicate record, double submission, double navigation). If any answer
-is "undefined behaviour", the implementation needs a disabled state
-or idempotency guard.
+**Double action** — What if the user triggers the primary action twice before the first response? Name the specific duplicate outcome. If undefined behaviour → needs disabled state or idempotency guard.
 
-**Browser environment:** What if any browser API this feature uses
-is unavailable? Name each browser API call (localStorage, clipboard,
-share, intersection observer, matchMedia). For each one, name the
-failure mode when it is unavailable. If any is unguarded, the
-implementation is incomplete.
+**Browser environment** — Name each browser API call (localStorage, clipboard, share, intersection observer). For each, name the failure mode when unavailable.
 
-**Accessibility path:** What breaks for a user who is not using a
-mouse? Walk through the feature using only a keyboard. Name every
-interactive element that cannot be reached or triggered by keyboard.
-Name every dynamic state change that is not announced to a screen
-reader. These are failures of the feature, not optional enhancements.
+**Accessibility path** — Walk through the feature using only a keyboard. Name every interactive element that cannot be reached. Name every dynamic state change not announced to a screen reader.
 
-**Outcome of this phase:**
-Each question that surfaces a named failure scenario is a test
-obligation. Track them explicitly before writing implementation code.
-Apply `react-edge-case-testing` skill for the full thinking loop
-and test verification process.
+Each failure scenario identified is a test obligation.
 
 ---
 
 ## Phase 6 — Connect Failures to Tests
 
-The failure scenarios from Phase 5 are not design notes. Before
-implementation is complete:
-
-For each failure scenario identified in Phase 5, either:
-- Name the MSW handler configuration and assertion that proves
-  the defence holds, OR
+For each failure scenario from Phase 5, either:
+- Name the MSW handler configuration and assertion that proves the defence holds, OR
 - Explain architecturally why this scenario cannot occur
 
-A feature with failure scenarios and no corresponding tests is
-incomplete. Tests that do not correspond to a named failure scenario
-are coverage noise.
-
-The four required states (loading, error, empty, success) are the
-minimum. The adversarial questions surface what goes beyond them.
+Apply `react-edge-case-testing` skill for the full thinking loop.
 
 ---
 
 ## Phase 7 — Update DECISION_LOG.md
 
-If this task produced a new architectural decision (a library chosen,
-a pattern established, a constraint surfaced, a prior approach rejected),
-update DECISION_LOG.md.
+If this task produced a new architectural decision (library chosen, pattern established, constraint surfaced), update `DECISION_LOG.md`.
 
-Replace changed entries — do not append.
-If no architectural decision was made, skip this phase.
+Replace changed entries — do not append. If no architectural decision was made, skip.
 
 ---
 
 ## Anti-Patterns This Protocol Prevents
 
-❌ Creating a new hook that duplicates an existing one
-   → Phase 1 read catches it
-
-❌ Adding a 30KB library for something native fetch does
-   → Phase 2 bundle check catches it
-
-❌ Writing useMemo in a component
-   → Phase 2 Compiler check catches it
-
-❌ Implementing a feature without empty/error/loading states
-   → Phase 2 state budget catches it
-
-❌ Presenting a trade-off where accessibility is a dimension
-   → Accessibility is never a trade-off — Phase 4 removes it from options
-
-❌ Building a complex pattern for a 1-developer project
-   → Phase 3 small team rule catches it
-
-❌ Asking the user about a decision with a clear professional answer
-   → Phase 3 clear winner test catches it
-
-❌ Accepting a requirement that solves the wrong problem
-   → Phase 0 interrogation catches it
-
-❌ Reversing an architectural decision without noticing it conflicts with a prior one
-   → Phase 1 DECISION_LOG.md read catches it
-
-❌ Making an architectural choice that can't be explained to a future session
-   → Phase 7 DECISION_LOG.md update prevents it
+❌ Creating a new hook that duplicates an existing one → Phase 1 read catches it
+❌ Adding a 30KB library for something native fetch does → Phase 2 bundle check catches it
+❌ Writing useMemo in a component → Phase 2 Compiler check catches it
+❌ Implementing a feature without empty/error/loading states → Phase 2 state budget catches it
+❌ Building a complex pattern for a 1-developer project → Phase 3 small team rule catches it
+❌ Accepting a requirement that solves the wrong problem → Phase 0 interrogation catches it
+❌ Reversing an architectural decision without noticing conflict → Phase 1 DECISION_LOG.md read catches it
+❌ Making an architectural choice with no record of why → Phase 7 update prevents it
