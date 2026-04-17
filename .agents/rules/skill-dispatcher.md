@@ -30,6 +30,7 @@ READ: .agents/skills/design-philosophy/SKILL.md
 | `.agents/skills/react-data-display/SKILL.md` | table, sorting, filtering, chart, bar chart, line chart, graph, visualization, virtual list, large dataset, empty state, date-fns |
 | `.agents/skills/react-edge-case-testing/SKILL.md` | new feature implementation, write tests, edge case, failure scenario, what could go wrong, implement |
 | `.agents/skills/react-error-handling/SKILL.md` | error, bug, broken, TypeError, cannot read, crash, not working, fix this, module not found, version mismatch, 401, 500, CORS |
+| `.agents/skills/frontend-design/SKILL.md` | web components, landing pages, dashboards, styling UI, distinctive design, creative aesthetics, visual atmosphere, beautiful UI |
 | `.agents/skills/react-forms-advanced/SKILL.md` | multi-step form, wizard, stepper, OTP, PIN input, phone number input, currency input, tag input, drag and drop, auto-save |
 | `.agents/skills/react-modern-css/SKILL.md` | container query, @container, fluid typography, clamp(), RTL, scroll snap, glassmorphism, backdrop blur, :has(), CSS nesting |
 | `.agents/skills/react-performance/SKILL.md` | performance, Core Web Vitals, LCP, INP, CLS, bundle size, lazy loading, Lighthouse, Sentry, image optimization |
