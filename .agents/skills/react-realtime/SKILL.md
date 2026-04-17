@@ -1,12 +1,11 @@
 name: react-realtime
 description: |
-  Use when the user needs real-time data, live updates, or persistent connections.
-  Trigger on: "WebSocket", "Socket.io", "real-time", "live", "SSE",
-  "Server-Sent Events", "chat", "messaging", "notifications" (push or live),
-  "presence", "who's online", "live dashboard", "streaming", "collaborative",
-  "multiplayer", "deployment logs", "build output", "AI streaming response",
-  "EventSource", "ws://", "wss://", "useWebSocket", "useSSE",
-  "ConnectionState", "reconnect", "exponential backoff".
+  LOAD AUTOMATICALLY for: WebSocket, Socket.io, real-time, live, SSE,
+  Server-Sent Events, chat, messaging, notifications, push, presence,
+  who's online, live dashboard, streaming, collaborative, multiplayer,
+  deployment logs, build output, AI streaming response, EventSource,
+  ws://, wss://, useWebSocket, useSSE, ConnectionState, reconnect, exponential backoff.
+  Load when the user needs real-time data, live updates, or persistent connections.
 ---
 
 > ⚠️ **Examples are version-anchored** to `versions.lock.md`. Verify method names and imports for the installed version via Context7 before use.

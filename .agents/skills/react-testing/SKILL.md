@@ -6,11 +6,11 @@ requires:
   - msw@^2
   - "@playwright/test@^1"
 description: |
-  Use when the project needs test setup, test writing, or test infrastructure.
-  Trigger on: "test", "Vitest", "Testing Library", "MSW", "Mock Service Worker",
-  "Playwright", "coverage", "unit test", "integration test", "E2E", "test setup",
-  "vitest config", "test environment", "jest-axe", "axe", "accessibility test",
-  "write tests for", "how do I test", "test this component", "test this hook".
+  LOAD AUTOMATICALLY for: test, Vitest, Testing Library, MSW, Mock Service Worker,
+  Playwright, coverage, unit test, integration test, E2E, test setup,
+  vitest config, test environment, jest-axe, axe, accessibility test,
+  write tests for, how do I test, test this component, test this hook.
+  Load when the project needs test setup, test writing, or test infrastructure.
 ---
 > **Version check required** — before using any example in this skill:
 > `cat package.json | grep "vitest"` → if major differs from `requires:`, run the

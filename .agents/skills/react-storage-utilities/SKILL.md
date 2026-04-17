@@ -3,19 +3,15 @@ name: react-storage-utilities
 requires:
   - use-debounce@^10
 description: |
-  Use when the project needs browser storage, timers, file operations, keyboard shortcuts,
-  print styles, or the Web Share API. Trigger on:
-  "localStorage", "sessionStorage", "persist", "remember", "store in browser",
-  "dark mode" with persistence, "theme persistence",
-  "recently viewed", "recent items", "pinned items", "favorites",
-  "cookie consent", "GDPR banner",
-  "countdown timer", "flash sale timer", "session timer", "useInterval",
-  "download file", "export CSV", "download CSV", "export to CSV", "download blob",
-  "CSV import", "parse CSV", "upload CSV", "bulk import CSV",
-  "keyboard shortcut", "hotkey", "global shortcut", "shortcut cheat sheet",
-  "print styles", "print layout", "@media print", "printable report",
-  "share button", "Web Share API", "native share", "share this page",
-  "cart persistence", "persistent cart".
+  LOAD AUTOMATICALLY for: localStorage, sessionStorage, persist, remember,
+  store in browser, dark mode persistence, theme persistence, recently viewed,
+  recent items, pinned items, favorites, cookie consent, GDPR banner,
+  countdown timer, flash sale timer, session timer, useInterval, download file,
+  export CSV, download CSV, export to CSV, download blob, CSV import, parse CSV,
+  upload CSV, bulk import CSV, keyboard shortcut, hotkey, global shortcut,
+  shortcut cheat sheet, print styles, print layout, @media print, printable report,
+  share button, Web Share API, native share, share this page, cart persistence.
+  Load when the project needs browser storage, timers, file operations, keyboard shortcuts, print styles, or the Web Share API.
 ---
 > **Version check required** — before using any example in this skill:
 > `cat package.json | grep "use-debounce"` → if major differs from `requires:`, run the

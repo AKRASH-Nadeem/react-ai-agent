@@ -2,10 +2,6 @@
 trigger: always_on
 ---
 
----
-trigger: always_on
----
-
 > MCP MANDATE: Context7 must be called before generating any code that uses an external library. This is non-negotiable. Outdated API usage is never acceptable. Context7 is the source of truth. Training memory is a draft. If they conflict, Context7 wins.
 
 ---
@@ -75,7 +71,15 @@ sentry react v8 init browserTracingIntegration
 
 ## 2. shadcn MCP — Component Registry
 
-**Purpose**: Confirms which components exist in the installed registry and retrieves current component API before writing code against it.
+**Purpose**: Confirms which components exist in the installed registry and retrieves current component API, source code, and examples before writing code against it.
+
+**Available tools:**
+- `search_items_in_registries` — Find components by fuzzy name/description search
+- `view_items_in_registries` — View detailed component source code and metadata
+- `get_item_examples_from_registries` — Find usage examples and demos with complete code
+- `list_items_in_registries` — Browse all available components
+- `get_add_command_for_items` — Get the exact CLI command to install components
+- `get_audit_checklist` — Post-creation verification checklist
 
 **Call before:**
 - Using any shadcn component not personally confirmed to exist in `src/components/ui/`
@@ -84,34 +88,21 @@ sentry react v8 init browserTracingIntegration
 - Installing any new component — confirm the name is valid first
 
 **Workflow:**
-1. `get-component field` — exists? Use Field family
-2. `get-component form` — exists? Use Form family
-3. Never guess — the answer is one MCP call away
+1. Search for the component: `search_items_in_registries` with `@shadcn`
+2. View its details: `view_items_in_registries` with `@shadcn/component-name`
+3. Get examples: `get_item_examples_from_registries` with `component-demo`
+4. Never guess — the answer is one MCP call away
 
 ---
 
-## 3. Figma MCP — Design Spec
-
-**Purpose**: Reads live Figma file structure — layers, spacing, typography, color tokens, component variants — for pixel-accurate code generation.
-
-**Call when:**
-- User provides a Figma file URL or link
-- Building a component that should match a design spec
-- Extracting spacing, color, or typography tokens
-- Checking component variants before building
-
-**What to extract:**
-- Color styles → CSS HSL variables
-- Text styles → type scale tokens
-- Spacing → Tailwind spacing scale
-- Component hierarchy → React component tree
-- Auto-layout direction/spacing → Flexbox or Grid
-
----
-
-## 4. Magic UI MCP — Animated Components
+## 3. Magic UI MCP — Animated Components
 
 **Purpose**: Checks the Magic UI library for production-ready animated components before building from scratch.
+
+**Available tools:**
+- `searchRegistryItems` — Search by keyword or use case
+- `getRegistryItem` — Get detailed component info, source code, and examples
+- `listRegistryItems` — Browse all available components
 
 **Call before building:**
 - Hero sections with animated text or backgrounds
@@ -124,25 +115,14 @@ sentry react v8 init browserTracingIntegration
 - Any "wow factor" visual component
 
 **Workflow:**
-1. Check if the component exists in Magic UI
-2. If yes — use the provided JSX + install the exact dependency it specifies
-3. If no — build from scratch using the **react-animations** skill
+1. Search: `searchRegistryItems` with the desired effect
+2. Get details: `getRegistryItem` with `includeSource: true` and `includeExamples: true`
+3. If found — use the provided JSX + install the exact dependency it specifies
+4. If not found — build from scratch using the **react-animations** skill
 
 ---
 
-## 5. GitHub MCP — Codebase Context
-
-**Purpose**: Reads existing project files and patterns before generating new code. Prevents pattern drift.
-
-**Call when:**
-- Generating a new component — check existing component patterns first
-- Naming a hook or utility — check existing naming conventions
-- Adding a new feature — find similar features to follow the same pattern
-- Debugging an error — search for where the failing module is used elsewhere
-
----
-
-## 6. Fetch MCP — Live URL Content
+## 4. Fetch MCP — Live URL Content
 
 **Purpose**: Fetches live content from any URL — changelogs, migration guides, docs that Context7 doesn't cover.
 
@@ -157,10 +137,30 @@ sentry react v8 init browserTracingIntegration
 ## Priority Order
 
 ```
-1. GitHub MCP       → what does our codebase already do?
-2. shadcn MCP       → does this component exist in the installed registry?
-3. Context7 MCP     → what does the library's current API say?
-4. Figma MCP        → what does the design spec require?
-5. Magic UI MCP     → does this animated component already exist?
-6. Fetch MCP        → is there a live doc URL to verify against?
+1. Context7 MCP      → what does the library's current API say?
+2. shadcn MCP        → does this component exist in the installed registry?
+3. Magic UI MCP      → does this animated component already exist?
+4. Fetch MCP         → is there a live doc URL to verify against?
 ```
+
+### When to Use MCP vs Skills vs Training Memory
+
+| Scenario | Source |
+|----------|--------|
+| Library API syntax, method signatures | **Context7** (always) |
+| Component exists in registry? | **shadcn MCP** |
+| Animated component ready to use? | **Magic UI MCP** |
+| Live docs/changelog | **Fetch MCP** |
+| Architectural patterns, design philosophy | **Skills** |
+| HTML/CSS basics, TypeScript language | Training memory (OK) |
+| Version-specific library code | **Context7** with version-specific query |
+
+---
+
+## MCP Failure Handling
+
+If an MCP server is unavailable or returns an error:
+1. **Do not proceed from memory.** State: "MCP server [name] is unavailable."
+2. **Try alternative:** Context7 → Fetch MCP for docs URL → web search
+3. **If no MCP works:** State the limitation to the user and ask whether to proceed with best-effort from training or to wait.
+4. **Never silently fall back to training memory** when MCP was supposed to validate.

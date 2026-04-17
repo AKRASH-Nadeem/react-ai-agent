@@ -3,15 +3,14 @@ name: react-auth-lifecycle
 requires:
   - react-router-dom@^7
 description: |
-  Use when the project has user authentication, authorization, or session management.
-  Trigger on: "login", "logout", "sign in", "sign out", "authentication",
-  "protected route", "private route", "auth guard", "redirect to login",
-  "JWT", "access token", "refresh token", "session",
-  "role", "permission", "RBAC", "admin vs user", "access control",
-  "OAuth", "social login", "Google login", "GitHub login",
-  "session expiry", "token expiry", "force logout",
-  "user profile", "current user", "useAuth", "auth state",
-  "Clerk", "Auth.js", "Supabase Auth", "Firebase Auth".
+  LOAD AUTOMATICALLY for: login, logout, sign in, sign out, authentication,
+  protected route, private route, auth guard, redirect to login,
+  JWT, access token, refresh token, session, role, permission, RBAC,
+  admin vs user, access control, OAuth, social login, Google login,
+  GitHub login, session expiry, token expiry, force logout,
+  user profile, current user, useAuth, auth state,
+  Clerk, Auth.js, Supabase Auth, Firebase Auth.
+  Load when building authentication or authorization features.
 ---
 > **Version check required** — before using any example in this skill:
 > `cat package.json | grep "react-router-dom"` → if major differs from `requires:`, run the

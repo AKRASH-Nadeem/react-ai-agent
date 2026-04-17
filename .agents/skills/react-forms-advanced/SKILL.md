@@ -5,14 +5,12 @@ requires:
   - "@hookform/resolvers@^3"
   - zod@^3
 description: |
-  Use when the project needs complex form patterns beyond a single-page form. Trigger on:
-  "multi-step", "wizard", "stepper", "step 1 of 3", "onboarding flow",
-  "OTP", "PIN input", "verification code", "6-digit",
-  "phone number input", "country code", "international phone",
-  "currency input", "money input", "price field", "number format",
-  "tag input", "multi-select input", "chips", "pills",
-  "drag and drop", "sortable list", "reorder", "dnd-kit", "kanban",
-  "auto-save", "save draft", "autosave", file upload within a form.
+  LOAD AUTOMATICALLY for: multi-step, wizard, stepper, step 1 of 3, onboarding flow,
+  OTP, PIN input, verification code, 6-digit, phone number input, country code,
+  international phone, currency input, money input, price field, number format,
+  tag input, multi-select input, chips, pills, drag and drop, sortable list,
+  reorder, dnd-kit, kanban, auto-save, save draft, autosave, file upload within a form.
+  Load when the project needs complex form patterns beyond a single-page form.
 ---
 
 > ⚠️ **Version check required before use.** Call shadcn MCP `get-component field` and `get-component form` to confirm which is available in the installed registry. Examples below cover both — use the one that exists.

@@ -1,22 +1,16 @@
 ---
 name: ux-interaction
 description: |
-  Use when building any user-facing interface. Trigger on:
-  "user flow", "onboarding", "empty state", "loading state", "error state",
-  "navigation", "information architecture", "IA", "site map", "page structure",
-  "user journey", "UX", "interaction design", "affordance", "feedback",
-  "confirmation", "dialog", "modal", "toast", "notification", "alert",
-  "progressive disclosure", "cognitive load", "mental model",
-  "form UX" (distinct from form validation — this covers field order, labels, hints),
-  "wizard", "multi-step", "stepper" (UX flow layer, not implementation),
-  "search UX", "filter UX", "pagination UX", "infinite scroll decision",
-  "dashboard layout", "data density", "table UX", "card vs table",
-  "settings page", "profile page", "landing page flow",
-  "mobile UX", "touch interaction", "gesture",
-  "destructive action", "undo", "optimistic UI", "skeleton",
-  "tooltip", "popover", "contextual help",
-  any task where the user says "it feels confusing", "users don't know where to go",
-  "the flow doesn't make sense", or requests a UX review.
+  LOAD AUTOMATICALLY for: user flow, onboarding, empty state, loading state, error state,
+  navigation, information architecture, IA, site map, page structure, user journey,
+  UX, interaction design, affordance, feedback, confirmation, dialog, modal, toast,
+  notification, alert, progressive disclosure, cognitive load, mental model,
+  form UX, form UX layer, wizard, multi-step, stepper, search UX, filter UX, pagination UX,
+  infinite scroll decision, dashboard layout, data density, table UX, card vs table,
+  settings page, profile page, landing page flow, mobile UX, touch interaction, gesture,
+  destructive action, undo, optimistic UI, skeleton, tooltip, popover, contextual help,
+  feels confusing, where to go, makes no sense, UX review.
+  Load when building any user-facing interface or reviewing interactions.
 ---
 
 > **Scope of this skill:** UX reasoning, interaction patterns, information architecture, and feedback design. Visual implementation → `design-philosophy.md`. Accessibility implementation → `react-accessibility`. Animation mechanics → `react-animations`. Form validation → `react-forms-advanced`.

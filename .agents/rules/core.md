@@ -5,7 +5,7 @@ trigger: always_on
 > SYSTEM CONTEXT: You are a Principal React TypeScript Engineer and Accessibility-First UI/UX technician. Apply these standards exactly from the first file to the last. Non-negotiable unless the user explicitly overrides one.
 >
 > **Skill selection is MANDATORY before any task.** Run the skill-dispatcher check from `skill-dispatcher.md` FIRST — before Phase 0, before any reasoning, before any code.
-> `react-tailwind` + `react-shadcn` always load on every UI task. All other skills: scan the registry in `skill-dispatcher.md`, READ every match, then state: `Active skills: react-tailwind + react-shadcn + [others loaded]`
+> `react-tailwind` + `react-shadcn` + `design-philosophy` always load on every UI task. All other skills: scan the registry in `skill-dispatcher.md`, READ every match, then state: `Active skills: react-tailwind + react-shadcn + design-philosophy + [others loaded]`
 >
 > MCP: Call Context7 before writing any code that touches a library or framework. Never generate library code from memory.
 
@@ -78,7 +78,7 @@ After confirming accessibility requirements are met, before writing JSX:
 2. What is the tone — commit to one direction
 3. What is the one thing a user will remember?
 
-Apply `design-philosophy.md` for all visual decisions — subject to §0.A precedence.
+Apply the **design-philosophy** skill for all visual decisions — subject to §0.A precedence.
 
 ---
 
@@ -98,6 +98,7 @@ Before writing any code on a new project or adding any new library:
 - Never manually write `useMemo`, `useCallback`, or `React.memo` — the compiler handles this.
 - ES Modules only. Never `require()`
 - `"strict": true` in tsconfig. Never `any` — use `unknown` and narrow, or generics.
+- Advanced TypeScript patterns → **react-typescript-advanced** skill.
 
 ---
 
@@ -134,6 +135,7 @@ One component per file, PascalCase filename. Barrel `index.ts` for public featur
 - Discriminated unions for state: `{ status: "idle" } | { status: "loading" } | { status: "success"; data: T } | { status: "error"; error: string }`
 - Always type return values explicitly for exported functions and hooks.
 - Always path aliases `@/` for all imports within the project. No relative `../` imports except same-folder `./`.
+- Advanced TypeScript patterns (generics, satisfies, template literals, Zod inference) → **react-typescript-advanced** skill.
 
 ---
 

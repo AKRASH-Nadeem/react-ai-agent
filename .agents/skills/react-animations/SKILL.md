@@ -3,14 +3,13 @@ name: react-animations
 requires:
   - motion@^11
 description: |
-  Use when the user asks about animations, transitions, motion, or visual movement.
-  Trigger on: "animation", "transition", "motion", "animate", "fade", "slide",
-  "scroll effect", "loading state", "skeleton", "spinner", "loader",
-  "hover effect", "micro-interaction", "page transition", "parallax",
-  "reveal on scroll", "stagger", "spring", "Framer Motion", "Motion",
-  "GSAP", "Lottie", "carousel", "modal open/close", "accordion",
-  "prefers-reduced-motion", "View Transitions API",
-  "CSS Scroll-Driven Animations", "scroll snap".
+  LOAD AUTOMATICALLY for: animation, transition, motion, animate, fade, slide,
+  scroll effect, loading state, skeleton, spinner, loader, hover effect,
+  micro-interaction, page transition, parallax, reveal on scroll, stagger,
+  spring, Framer Motion, Motion, GSAP, Lottie, carousel, modal open close,
+  accordion, prefers-reduced-motion, View Transitions API,
+  CSS Scroll-Driven Animations, scroll snap, tw-animate-css.
+  Load when implementing any visual motion or animation.
 ---
 > **Version check required** — before using any example in this skill:
 > `cat package.json | grep "motion"` → if major differs from `requires:`, run the

@@ -1,16 +1,13 @@
 ---
 name: react-modern-css
 description: |
-  Use when the project needs modern CSS features beyond standard Tailwind viewport breakpoints.
-  Trigger on: "container query", "component responsive", "@container",
-  "RTL", "right-to-left", "Arabic", "Hebrew", "logical properties",
-  "fluid typography", "clamp()", "fluid font", "responsive text",
-  "scroll snap", "carousel" (CSS-based), "horizontal scroll",
-  "frosted glass", "glassmorphism", "backdrop blur",
-  ":has()", "parent selector", "CSS nesting",
-  "aspect ratio", "responsive image container",
-  "text-balance", "text-pretty", "overscroll-behavior",
-  "color-scheme", "forced-colors".
+  LOAD AUTOMATICALLY for: container query, component responsive, @container,
+  RTL, right-to-left, Arabic, Hebrew, logical properties, fluid typography,
+  clamp(), fluid font, responsive text, scroll snap, carousel, horizontal scroll,
+  frosted glass, glassmorphism, backdrop blur, :has(), parent selector, CSS nesting,
+  aspect ratio, responsive image container, text-balance, text-pretty,
+  overscroll-behavior, color-scheme, forced-colors.
+  Load when the project needs modern CSS features beyond standard Tailwind viewport breakpoints.
 ---
 
 > ⚠️ **Version check required.** Run `cat package.json | grep tailwindcss` first. v3 and v4 differ significantly in config and available features.

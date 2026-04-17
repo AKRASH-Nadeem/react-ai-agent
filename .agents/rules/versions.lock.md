@@ -8,7 +8,7 @@ trigger: always_on
 # Before applying any skill example, compare these versions against
 # what is installed: cat package.json | grep "package-name"
 #
-# Last updated: 2026-03
+# Last updated: 2026-04
 
 ---
 
@@ -115,11 +115,13 @@ Context7 provides the exact method names and imports for your installed version.
 
 | Package | Baseline | Notes |
 |---------|----------|-------|
-| `tailwindcss` | `^4.0.0` (baseline) | v4: config in CSS, `@import "tailwindcss"`, `@custom-variant`, `@theme`. v3: `tailwind.config.ts`, `@tailwind` directives. **Always `cat package.json | grep tailwindcss` before writing config.** |
+| `tailwindcss` | `^4.0.0` (baseline) | v4: config in CSS, `@import "tailwindcss"`, `@custom-variant`, `@theme inline`, OKLCH colors. v3: `tailwind.config.ts`, `@tailwind` directives, HSL colors. **Always `cat package.json | grep tailwindcss` before writing config.** |
+| `@tailwindcss/vite` | `^4.0.0` | Tier 1 build integration for v4 + Vite. Preferred over PostCSS. |
+| `tw-animate-css` | `^1.2.0` | Animation utility for Tailwind v4. **NOT `tailwindcss-animate`** (v3 only). |
 | `clsx` | `^2.1.0` | |
 | `tailwind-merge` | `^2.5.0` | |
 
-> ⚠️ **Tailwind v4 is a major rewrite.** No `tailwind.config.ts` by default. If the project uses v3, do not apply v4 patterns. Check: `cat package.json | grep tailwindcss`
+> ⚠️ **Tailwind v4 is a major rewrite.** No `tailwind.config.ts` by default. OKLCH replaces HSL. `@theme inline` replaces `@theme` for runtime dark mode. `tw-animate-css` replaces `tailwindcss-animate`. `components.json` must have `tailwind.config: ""` (empty string). If the project uses v3, do not apply v4 patterns. Check: `cat package.json | grep tailwindcss`
 
 ---
 
@@ -127,7 +129,7 @@ Context7 provides the exact method names and imports for your installed version.
 
 | Package | Baseline | Notes |
 |---------|----------|-------|
-| `shadcn/ui` (CLI) | `^2.1.0` | Not an npm package — run `npx shadcn@latest init`. v2+: uses `Field` family. Pre-v2: uses `Form` family. Call shadcn MCP to confirm. |
+| `shadcn/ui` (CLI) | `^2.1.0` | Not an npm package — run `npx shadcn@latest init`. v2+: uses `Field`/`FieldLabel`/`FieldError` family + `ToggleGroup`. Pre-v2: uses `Form`/`FormField`/`FormItem` family. Call shadcn MCP to confirm which is installed. OKLCH colors in `cssVars`. `components.json` tailwind config must be `""` for v4. |
 | `lucide-react` | `^0.460.0` | Icon names changed significantly in v0.400+ |
 | `sonner` | `^1.0.0` | Toast notifications |
 

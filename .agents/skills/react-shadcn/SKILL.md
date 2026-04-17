@@ -1,10 +1,16 @@
 ---
 name: react-shadcn
 description: |
-  MANDATORY — load before every UI task without exception.
-  Covers all shadcn/ui usage: version detection, component install, form patterns
-  (Field vs Form), component wrapping rules, and MCP validation workflow.
-  Trigger on: any component, form, input, dialog, table, or UI primitive work.
+  LOAD AUTOMATICALLY for: shadcn, shadcn/ui, ui components, Button, Input,
+  Dialog, Sheet, Dropdown, Select, Combobox, Table, DataTable, Form, Field,
+  FieldLabel, FieldError, FieldGroup, FormField, FormItem, FormMessage,
+  Checkbox, Radio, Switch, Slider, Calendar, DatePicker, Command, Popover,
+  Tooltip, Avatar, Badge, Card, Separator, Tabs, Toast, Sonner, Alert,
+  Progress, Skeleton, ScrollArea, Accordion, Sidebar, Chart, InputOTP,
+  ToggleGroup, Toggle, install component, npx shadcn, components.json,
+  ui/ directory, component wrapping, registry, custom registry,
+  any React UI component work, any form component work, component library.
+  Load before using or installing any shadcn component.
 ---
 
 # shadcn/ui Standards
@@ -22,23 +28,62 @@ cat vite.config.ts | grep "@"
 
 If either is missing — configure alias first, then run shadcn init.
 
+---
+
 ## SH0.1 Version Check — Always First
 
 Before writing any shadcn component code:
 
 ```bash
 # Step 1 — check what's installed
-cat components.json | grep -E '"style"|"rsc"|"tsx"'
+cat components.json | grep -E '"style"|"rsc"|"tsx"|"tailwind"'
 
-# Step 2 — check what form component exists
+# Step 2 — check Tailwind config in components.json
+cat components.json | grep -A1 '"config"'
+# v4 MUST be "" (empty string). If it has a path → fix it.
+
+# Step 3 — check what form component exists
 ls src/components/ui/ | grep -E "^form|^field"
 
-# Step 3 — or use shadcn MCP (fastest)
-# get-component field   → exists? use Field family
-# get-component form    → exists? use Form family
+# Step 4 — or use shadcn MCP (fastest)
+# Use shadcn MCP tools: search for 'field' or 'form'
+# Returns current source and install command
 ```
 
 Never assume from memory. One MCP call confirms the truth.
+
+> ⚠️ **CRITICAL — components.json + Tailwind v4:**
+> In Tailwind v4, the `tailwind.config` field in `components.json` MUST be
+> an empty string `""`. If it contains a path to `tailwind.config.ts`,
+> shadcn init will fail because v4 has no config file.
+
+---
+
+## SH0.2 OKLCH Color System (v4 Default)
+
+shadcn/ui v4 uses OKLCH as its default color format. When adding custom colors
+via the registry or CSS, always use the OKLCH format:
+
+```json
+{
+  "cssVars": {
+    "light": {
+      "brand-background": "oklch(0.205 0.015 18)",
+      "brand-accent": "oklch(0.55 0.18 260)"
+    },
+    "dark": {
+      "brand-background": "oklch(0.85 0.015 18)",
+      "brand-accent": "oklch(0.62 0.20 260)"
+    }
+  }
+}
+```
+
+**Color pairing rules (WCAG contrast):**
+- `--foreground` on `--background` MUST meet 4.5:1 ratio
+- `--primary-foreground` on `--primary` MUST meet 4.5:1 ratio
+- `--muted-foreground` MUST meet 4.5:1 on `--background`
+- Use OKLCH lightness difference to check: >50% lightness gap = safe
 
 ---
 
@@ -51,13 +96,14 @@ Never assume from memory. One MCP call confirms the truth.
   npx shadcn@latest add [component-name]
   ```
 - Never write `components.json` by hand. Always run `npx shadcn@latest init`.
-- Verify a component name exists before installing: use shadcn MCP `get-component [name]` — component names change between versions.
+- Verify a component name exists before installing: use shadcn MCP tools to search or view items. Component names change between versions.
+- Use `shadcn info --json` to read project config automatically when available.
 
 ---
 
 ## SH2. Forms — Version-Dependent Pattern
 
-### shadcn v2+ → Field family
+### shadcn v2+ → Field family (Recommended)
 
 ```bash
 npx shadcn@latest add field
@@ -152,20 +198,47 @@ export function ExampleForm() {
 
 ---
 
+## SH2.1 New Composition Primitives (v2+)
+
+### ToggleGroup
+
+```bash
+npx shadcn@latest add toggle-group
+```
+
+```tsx
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+
+<ToggleGroup type="single" defaultValue="center">
+  <ToggleGroupItem value="left" aria-label="Align left">
+    <AlignLeft className="size-4" />
+  </ToggleGroupItem>
+  <ToggleGroupItem value="center" aria-label="Align center">
+    <AlignCenter className="size-4" />
+  </ToggleGroupItem>
+  <ToggleGroupItem value="right" aria-label="Align right">
+    <AlignRight className="size-4" />
+  </ToggleGroupItem>
+</ToggleGroup>
+```
+
+---
+
 ## SH3. High-Churn Components — Always Verify via MCP
 
-These components change APIs frequently. Call shadcn MCP before using any of them:
+These components change APIs frequently. Use shadcn MCP before using any of them:
 
 | Component | Why |
 |---|---|
 | `field` / `form` | Switched between versions — verify which exists |
 | `input-otp` | Underlying library changes |
-| `sidebar` | Major API overhaul in 2024 |
+| `sidebar` | Major API overhaul |
 | `calendar` | Peer dependency changes (react-day-picker) |
-| `chart` | Added in 2024, API still evolving |
+| `chart` | API still evolving |
 | `command` | Import path changed |
+| `toggle-group` | New in v2+ |
 
-MCP call: `get-component [name]` — returns the current source and install command.
+MCP workflow: Use shadcn MCP `search_items_in_registries` or `view_items_in_registries` to confirm current API.
 
 ---
 
@@ -198,6 +271,57 @@ export function AppButton({ isLoading, children, className, disabled, ...props }
       ) : children}
     </Button>
   );
+}
+```
+
+---
+
+## SH5. Registry API — Custom & Third-Party Registries
+
+### Using third-party registries (e.g. MagicUI)
+
+shadcn components can be installed from any compatible registry:
+
+```bash
+# Install from MagicUI registry
+npx shadcn@latest add "https://magicui.design/r/marquee"
+
+# Install from any custom registry
+npx shadcn@latest add "https://registry.example.com/r/component-name"
+```
+
+### Building a custom registry
+
+Registry items follow a JSON schema. See `https://ui.shadcn.com/schema/registry-item.json`.
+
+```json
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "custom-component",
+  "type": "registry:component",
+  "dependencies": ["some-npm-package"],
+  "files": [
+    {
+      "path": "components/custom-component.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "cssVars": {
+    "light": { "custom-color": "oklch(0.55 0.18 260)" },
+    "dark": { "custom-color": "oklch(0.62 0.20 260)" }
+  }
+}
+```
+
+### Registering Tailwind plugins in registry items
+
+```json
+{
+  "css": {
+    "@plugin \"@tailwindcss/typography\"": {},
+    "@plugin \"tw-animate-css\"": {}
+  },
+  "dependencies": ["@tailwindcss/typography", "tw-animate-css"]
 }
 ```
 
@@ -246,15 +370,19 @@ npx tsc --noEmit
 
 ---
 
-## SH5. Cheatsheet
+## SH7. Cheatsheet
 
 | Concern | Action |
 |---|---|
 | First setup | `npx shadcn@latest init` — never hand-write `components.json` |
 | Install component | `npx shadcn@latest add [name]` |
-| Verify component exists | shadcn MCP: `get-component [name]` |
+| Verify component exists | shadcn MCP: search or view items in registry |
 | Forms v2+ | `Field` + `FieldLabel` + `FieldError` from `@/components/ui/field` |
 | Forms pre-v2 | `FormField` + `FormItem` + `FormMessage` from `@/components/ui/form` |
 | Unsure which version | `ls src/components/ui/` or shadcn MCP |
 | Customize a component | Wrap in `src/components/` — never edit `src/components/ui/` |
-| High-churn components | Always call shadcn MCP before: `field`, `form`, `sidebar`, `calendar`, `chart` |
+| High-churn components | Always use shadcn MCP before: `field`, `form`, `sidebar`, `calendar`, `chart` |
+| Third-party registry | `npx shadcn@latest add "https://registry.url/r/name"` |
+| Color format (v4) | OKLCH — `oklch(lightness chroma hue)` |
+| components.json + v4 | `tailwind.config` must be `""` (empty string) |
+| Animation (v4) | `tw-animate-css` — NOT `tailwindcss-animate` |

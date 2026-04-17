@@ -5,12 +5,12 @@ requires:
   - "@tanstack/react-virtual@^3"
   - recharts@^2
 description: |
-  Use when the project needs data tables, charts, virtual lists, or data visualization.
-  Trigger on: "data table", "table with sorting", "filterable table", "paginated table",
-  "TanStack Table", "react-table", "chart", "bar chart", "line chart", "pie chart",
-  "graph", "visualization", "Recharts", "D3", "virtual list", "virtualized",
-  "10,000 rows", "large dataset", "empty state", "no results", "nothing here",
-  "z-index", "stacking context", "date format", "date-fns", "relative time", "time ago".
+  LOAD AUTOMATICALLY for: data table, table with sorting, filterable table, paginated table,
+  TanStack Table, react-table, chart, bar chart, line chart, pie chart,
+  graph, visualization, Recharts, D3, virtual list, virtualized,
+  10,000 rows, large dataset, empty state, no results, nothing here,
+  z-index, stacking context, date format, date-fns, relative time, time ago.
+  Load when the project needs data tables, charts, virtual lists, or data visualization.
 ---
 > **Version check required** — before using any example in this skill:
 > `cat package.json | grep "recharts"` → if major differs from `requires:`, run the

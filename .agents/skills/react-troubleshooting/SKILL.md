@@ -1,17 +1,12 @@
 ---
 name: react-troubleshooting
 description: |
-  Use when diagnosing or fixing a bug, unexpected behavior, or error.
-  Trigger on: any error message, stack trace, or "it's not working" report,
-  "TypeError", "ReferenceError", "cannot read properties of undefined",
-  "too many re-renders", "infinite loop", "useEffect running twice",
-  "state not updating", "component not re-rendering", "stale closure",
-  "hydration error", "white screen", "blank page", "flickering",
-  "layout shift", "CSS not applying", "Tailwind class not working",
-  "TypeScript error I don't understand",
-  TanStack Query not fetching / always loading / stale data,
-  react-hook-form field not registering / not validating,
-  "weird behavior I can't explain", debugging sessions, any performance issue.
+  LOAD AUTOMATICALLY for: TypeError, ReferenceError, cannot read properties of undefined,
+  too many re-renders, infinite loop, useEffect running twice, state not updating,
+  component not re-rendering, stale closure, hydration error, white screen,
+  blank page, flickering, layout shift, CSS not applying, Tailwind class not working,
+  TypeScript error, not working, unexpected behavior, error message, stack trace.
+  Load when diagnosing or fixing a bug, unexpected behavior, or error.
 ---
 
 > ⚠️ **Never guess at the cause of a bug.** Follow the systematic methodology below. Guessing wastes time and introduces regressions.

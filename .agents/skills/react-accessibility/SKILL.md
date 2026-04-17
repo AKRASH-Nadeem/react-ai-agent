@@ -1,16 +1,16 @@
 ---
 name: react-accessibility
 description: |
-  Use when the project targets WCAG 2.2 compliance, custom interactive widgets,
-  or requires advanced screen reader support. Trigger on:
-  "WCAG", "a11y", "accessibility audit", "screen reader",
-  "focus trap", "focus management", "skip navigation", "skip link",
-  "aria-live", "live region", "announce", "screen reader announcement",
-  "keyboard navigation", "arrow key navigation", "roving tabindex",
-  "axe", "automated accessibility", "jest-axe",
-  "prefers-reduced-motion", "reduced motion",
-  accessibility for charts, drag-and-drop, data tables, or custom widgets.
----
+  LOAD AUTOMATICALLY for: WCAG, a11y, accessibility, screen reader,
+  focus trap, focus management, skip navigation, skip link,
+  aria-live, live region, announce, screen reader announcement,
+  keyboard navigation, arrow key navigation, roving tabindex,
+  axe, automated accessibility, jest-axe, focus-trap-react,
+  prefers-reduced-motion, reduced motion, color contrast,
+  accessible table, accessible chart, accessible drag and drop,
+  custom interactive widget, aria attributes, aria-label,
+  aria-describedby, aria-modal, role dialog, role alert.
+  Load when building custom interactive widgets or ensuring WCAG compliance.
 ---
 
 > ⚠️ **Examples are version-anchored** to `versions.lock.md`. Verify method names and imports for the installed version via Context7 before use.

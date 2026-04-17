@@ -1,15 +1,16 @@
 ---
 name: react-error-handling
 description: |
-  Use when an error needs to be diagnosed, traced, or fixed in a React TypeScript project.
-  Trigger on: "error", "bug", "broken", "not working", "fix this", "TypeError", "cannot read",
-  "undefined is not", "is not a function", "module not found", "cannot find module",
-  "type error", "runtime error", "build error", "failed to compile", "unexpected token",
-  "property does not exist", "version mismatch", "after upgrade", "after update",
-  "something changed", "stopped working", "red underline", "lint error", "ESLint",
-  "TypeScript error", "TS2345", "TS2339", "TS2304", "console error", "Sentry alert",
-  "white screen", "blank page", "crash", "infinite loop", "memory leak",
-  "network error", "401", "403", "404", "500", "CORS".
+  LOAD AUTOMATICALLY for: error, bug, broken, not working, fix this,
+  TypeError, cannot read, undefined is not, is not a function,
+  module not found, cannot find module, type error, runtime error,
+  build error, failed to compile, unexpected token, property does not exist,
+  version mismatch, after upgrade, after update, something changed,
+  stopped working, red underline, lint error, ESLint, TypeScript error,
+  TS2345, TS2339, TS2304, console error, Sentry alert, white screen,
+  blank page, crash, infinite loop, memory leak, network error,
+  401, 403, 404, 500, CORS, stale closure, too many re-renders.
+  Load when diagnosing any error in a React TypeScript project.
 ---
 
 # Error Handling Standards

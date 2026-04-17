@@ -1,13 +1,10 @@
 ---
 name: react-edge-case-testing
-description: >
-  Apply this skill for ALL feature implementation and test writing in React.
-  Teaches HOW to think about failure — not what failures to look for.
-  Activates alongside react-testing whenever a component, hook, or feature
-  is being designed, implemented, or tested.
-  Trigger on: any new feature, component, hook, "write tests", "add tests",
-  "what could go wrong", "implement this", "how should I test this",
+description: |
+  LOAD AUTOMATICALLY for: write tests, add tests, what could go wrong,
+  implement this, how should I test this, any new feature, component, hook,
   any form, any API integration, any real-time feature, any auth flow.
+  Load alongside react-testing for ALL feature implementation to think about failure edges.
 ---
 
 # React — Failure-First Reasoning & Edge-Case Testing Philosophy

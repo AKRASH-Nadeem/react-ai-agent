@@ -4,15 +4,15 @@ requires:
   - "@tanstack/react-query@^5"
   - zod@^3
 description: |
-  Use when the project uses REST APIs beyond basic CRUD. Trigger on:
-  "token refresh", "401", "interceptor", "auth header", "Bearer token",
-  "optimistic update", "optimistic UI", "infinite scroll", "load more",
-  "cursor pagination", "useInfiniteQuery", "file upload", "image upload",
-  "multipart", "upload progress", "debounce", "search input", "typeahead",
-  "autocomplete" (API-backed), "retry", "backoff", "rate limit", "429",
-  "environment variable", "VITE_", ".env", "env validation",
-  "axios instance", "request interceptor", "cache invalidation",
-  "staleTime", "parallel queries", "sequential requests".
+  LOAD AUTOMATICALLY for: token refresh, 401, interceptor, auth header,
+  Bearer token, optimistic update, optimistic UI, infinite scroll,
+  load more, cursor pagination, useInfiniteQuery, file upload,
+  image upload, multipart, upload progress, debounce, search input,
+  typeahead, autocomplete, retry, backoff, rate limit, 429,
+  environment variable, VITE_, .env, env validation, axios instance,
+  request interceptor, cache invalidation, staleTime, parallel queries,
+  sequential requests, API error handling, server state.
+  Load when building REST API integrations beyond basic CRUD.
 ---
 > **Version check required** — before using any example in this skill:
 > `cat package.json | grep "zod"` → if major differs from `requires:`, run the

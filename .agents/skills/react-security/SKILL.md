@@ -1,15 +1,14 @@
 ---
 name: react-security
 description: |
-  Use when the project handles secrets, renders user-generated content, or needs
-  security hardening. Trigger on: "XSS", "dangerouslySetInnerHTML",
-  "user-generated content", "HTML injection", "CSRF", "cross-site",
-  "Content Security Policy", "CSP", "API key", "secret key", "secret management",
-  "environment secret", "private key", "credentials",
-  "copy to clipboard", "clipboard API", "open redirect", "redirect validation",
-  "npm audit", "dependency vulnerability", "security scan",
-  rendering rich text, markdown, or user-controlled HTML.
----
+  LOAD AUTOMATICALLY for: XSS, dangerouslySetInnerHTML, user-generated content,
+  HTML injection, CSRF, cross-site, Content Security Policy, CSP,
+  API key, secret key, secret management, environment secret,
+  private key, credentials, copy to clipboard, clipboard API,
+  open redirect, redirect validation, npm audit, dependency vulnerability,
+  security scan, DOMPurify, react-markdown, rich text,
+  markdown rendering, user-controlled HTML.
+  Load when handling secrets or rendering user-generated content.
 ---
 
 > ⚠️ **Examples are version-anchored** to `versions.lock.md`. Verify method names and imports for the installed version via Context7 before use.

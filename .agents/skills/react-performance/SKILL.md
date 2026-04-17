@@ -4,11 +4,11 @@ requires:
   - "@sentry/react@^8"
   - "@lhci/cli@^0.14"
 description: |
-  Use when the project needs performance monitoring, optimization, or CI enforcement.
-  Trigger on: "performance", "Core Web Vitals", "LCP", "INP", "CLS", "bundle size",
-  "lazy loading", "Lighthouse", "Sentry", "error tracking", "image optimization",
-  "code splitting", "tree shaking", "bundle budget", "web performance", "slow",
-  "performance audit", "perf", "lighthouse CI", "Sentry DSN", "BrowserTracing".
+  LOAD AUTOMATICALLY for: performance, Core Web Vitals, LCP, INP, CLS, bundle size,
+  lazy loading, Lighthouse, Sentry, error tracking, image optimization,
+  code splitting, tree shaking, bundle budget, web performance, slow,
+  performance audit, perf, lighthouse CI, Sentry DSN, BrowserTracing.
+  Load when the project needs performance monitoring, optimization, or CI enforcement.
 ---
 > **Version check required** — before using any example in this skill:
 > `cat package.json | grep "@sentry/react"` → if major differs from `requires:`, run the

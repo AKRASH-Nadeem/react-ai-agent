@@ -1,15 +1,16 @@
 ---
 name: react-component-patterns
 description: |
-  Use when designing or refactoring components for reuse, composability, or flexibility.
-  Trigger on: "compound component", "slot", "render prop", "children pattern",
-  "too many props", "boolean prop explosion", "prop drilling",
-  "how do I make this reusable", "how should I structure this component",
-  "flexible component", "headless component", "polymorphic component",
-  "context within a component", "component API design",
-  reviewing or refactoring a component that has 5+ props,
-  building a design system component,
-  "provider pattern", "composition over configuration".
+  LOAD AUTOMATICALLY for: compound component, reusable component,
+  component API design, slot pattern, render prop, children pattern,
+  prop drilling, boolean props, too many props, composition,
+  forwardRef, displayName, polymorphic component, as prop, asChild,
+  custom hook extraction, controlled uncontrolled component,
+  component refactoring, component architecture, context pattern,
+  how to structure a component, flexible component design,
+  React 19 ref, use() hook, async component, provider pattern,
+  headless component, composition over configuration.
+  Load when designing or refactoring any React component.
 ---
 
 > **Philosophy:** A component's API is a contract. Design it for the caller, not the implementer. The best components are open for extension and closed for modification.
@@ -361,10 +362,25 @@ type ButtonProps = {
 
 ## CP7. Forwarding Refs
 
-Always forward refs on components that wrap HTML elements. Callers need the ref to trigger focus, measure, or integrate with third-party libraries.
+### React 19+ — ref is a regular prop (no forwardRef needed!)
 
 ```tsx
-// ✅ Always forward refs on wrapper components
+// ✅ React 19+ — ref is just a prop, no wrapper needed
+function TextInput({ label, error, ref, ...props }: InputProps & { ref?: React.Ref<HTMLInputElement> }) {
+  return (
+    <div className="space-y-1">
+      <label className="text-sm font-medium">{label}</label>
+      <input ref={ref} className={cn("input", error && "border-destructive")} {...props} />
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </div>
+  );
+}
+```
+
+### React 18 and below — use forwardRef
+
+```tsx
+// ✅ React 18 — still use forwardRef
 const TextInput = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, ...props }, ref) => {
     return (
@@ -377,14 +393,43 @@ const TextInput = forwardRef<HTMLInputElement, InputProps>(
   }
 );
 
-// Required: set displayName for React DevTools
+// Required in React 18: set displayName for React DevTools
 TextInput.displayName = "TextInput";
 ```
+
+**Check your React version:**
+```bash
+cat package.json | grep '"react"'
+```
+- React 19+ → ref as prop, skip forwardRef
+- React 18 → use forwardRef + displayName
 
 **When to forward refs:**
 - Any component that wraps a native HTML element (`input`, `button`, `div`, etc.)
 - Any component that third-party libraries might need a ref to (modals, popovers, etc.)
 - Never required for purely compositional components that don't wrap an element directly
+
+---
+
+## CP7.1 React 19+ — use() Hook for Async Data
+
+```tsx
+// React 19+ — use() can read promises and context in render
+import { use, Suspense } from 'react';
+
+function UserProfile({ userPromise }: { userPromise: Promise<User> }) {
+  const user = use(userPromise); // suspends until resolved
+  return <h1>{user.name}</h1>;
+}
+
+// Wrap with Suspense at the parent level
+<Suspense fallback={<Skeleton />}>
+  <UserProfile userPromise={fetchUser(id)} />
+</Suspense>
+```
+
+> **Note:** `use()` works with Promises and Context. It can be called inside
+> conditionals and loops unlike other hooks. Only available in React 19+.
 
 ---
 
