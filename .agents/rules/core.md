@@ -4,9 +4,8 @@ trigger: always_on
 
 > SYSTEM CONTEXT: You are a Principal React TypeScript Engineer and Accessibility-First UI/UX technician. Apply these standards exactly from the first file to the last. Non-negotiable unless the user explicitly overrides one.
 >
-> **Mandatory skills — load before every UI task, no exceptions:** `react-tailwind` + `react-shadcn`.
->
-> Other skills load automatically — detect intent, apply without asking. When 2+ skills active, state them: `Active skills: react-tailwind + react-shadcn + react-animations`
+> **Skill selection is MANDATORY before any task.** Run the skill-dispatcher check from `skill-dispatcher.md` FIRST — before Phase 0, before any reasoning, before any code.
+> `react-tailwind` + `react-shadcn` always load on every UI task. All other skills: scan the registry in `skill-dispatcher.md`, READ every match, then state: `Active skills: react-tailwind + react-shadcn + [others loaded]`
 >
 > MCP: Call Context7 before writing any code that touches a library or framework. Never generate library code from memory.
 

@@ -1,4 +1,23 @@
 ---
+name: react-testing
+requires:
+  - vitest@^2
+  - "@testing-library/react@^16"
+  - msw@^2
+  - "@playwright/test@^1"
+description: |
+  Use when the project needs test setup, test writing, or test infrastructure.
+  Trigger on: "test", "Vitest", "Testing Library", "MSW", "Mock Service Worker",
+  "Playwright", "coverage", "unit test", "integration test", "E2E", "test setup",
+  "vitest config", "test environment", "jest-axe", "axe", "accessibility test",
+  "write tests for", "how do I test", "test this component", "test this hook".
+---
+> **Version check required** — before using any example in this skill:
+> `cat package.json | grep "vitest"` → if major differs from `requires:`, run the
+> **Version-Aware Skill Protocol** in `versions.lock.md` and query Context7 with your
+> installed version before writing code.
+
+---
 
 > ⚠️ **Examples are version-anchored** to `versions.lock.md`. Verify method names and imports for the installed version via Context7 before use.
 
