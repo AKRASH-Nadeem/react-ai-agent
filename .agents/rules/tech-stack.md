@@ -12,8 +12,6 @@ trigger: always_on
 
 ## TS0. When This Rule Activates
 
-This rule governs two distinct situations:
-
 1. **New project** — any task starting from scratch, including scaffold, init, or "start a new app"
 2. **New library introduction** — any time a library not already in `package.json` would solve a problem
 
@@ -23,25 +21,24 @@ In both cases: **stop, propose, get approval, then proceed.** Never install firs
 
 ## TS1. New Project — Stack Proposal Protocol
 
-Before any code is written on a new project, deliver a structured stack proposal.
-
-### Step 1 — Gather requirements (ask if not stated)
+### Step 1 — Gather requirements (ask only for what's missing)
 
 ```
-1. App type         → SPA / SSR / SSG / PWA / desktop (Electron/Tauri)?
-2. Primary users    → consumer-facing / internal tool / developer tool?
-3. Data patterns    → mostly static / REST API / real-time / offline-capable?
+1. App type         → SPA / SSR / SSG / PWA / desktop?
+2. Primary users    → consumer / internal tool / developer tool?
+3. Data patterns    → static / REST / real-time / offline?
 4. Auth required?   → yes / no / oauth / magic link
-5. Scale target     → prototype / production MVP / high-traffic?
-6. Existing backend → REST / GraphQL / tRPC / Firebase / Supabase / other?
+5. Scale target     → prototype / MVP / high-traffic?
+6. Existing backend → REST / GraphQL / tRPC / Firebase / other?
 7. Deployment       → Vercel / Netlify / Docker / S3+CDN / unknown?
+8. Architecture     → Feature-Based (default) or Type-Based (Atomic/Layered)?
+                      Feature-Based: group by domain (features/users/, features/billing/)
+                      Type-Based: group by layer (atoms/, molecules/, organisms/, services/)
+                      Recommend Feature-Based for apps with 3+ distinct domains.
+                      Recommend Type-Based for UI component libraries or small utilities.
 ```
-
-Never assume. If the user provides partial context, ask only for the missing pieces — do not ask all 7 at once if most are already stated.
 
 ### Step 2 — Propose with reasoning
-
-Present using this exact structure:
 
 ```
 ## Proposed Stack — [Project name]
@@ -51,6 +48,7 @@ Present using this exact structure:
 |----------------|---------------------|----------------------------------|
 | Framework      | React 19 + Vite 6   | ... |
 | Language       | TypeScript strict   | ... |
+| Architecture   | [Feature-Based / Type-Based] | [reason based on item 8] |
 | Routing        | React Router v7     | ... |
 | Styling        | Tailwind CSS v4     | ... |
 | UI components  | shadcn/ui           | ... |
@@ -62,211 +60,153 @@ Present using this exact structure:
 | Client state   | Zustand v5          | ... |
 | Forms          | RHF + Zod           | ... |
 
-### Optional (include only if requirements justify it)
-| Layer          | Choice              | Condition that triggers it      |
-|----------------|---------------------|----------------------------------|
-| Real-time      | Socket.io client    | If WebSocket is needed          |
-| Auth           | Clerk / Auth.js     | If auth is required             |
-| Charts         | Recharts            | If data viz is required         |
-| Component dev  | Storybook + addon-mcp (dev) | Recommended — user must opt in |
+### Optional (only if requirements justify)
+| Layer          | Choice              | Condition |
+|----------------|---------------------|-----------|
+| Real-time      | Socket.io client    | If WebSocket needed |
+| Auth           | Clerk / Auth.js     | If auth required |
+| Charts         | Recharts            | If data viz required |
+| Component dev  | Storybook + addon-mcp | Opt-in only |
 
 ### What I deliberately excluded and why
-- [Library X] — [reason it was considered and rejected]
-- [Library Y] — [reason not needed for this scope]
+- [Library X] — [reason considered and rejected]
 
 Confirm this stack or request changes before I begin.
 ```
 
-**The "why not alternatives" column is mandatory.** Showing the road not taken is what makes this trustworthy reasoning, not just a list.
-
 ### Step 3 — Lock the approved stack
 
-Once the user approves, state:
-
+Once approved, state:
 ```
-Stack approved. I will:
+Stack approved. Architecture: [Feature-Based | Type-Based]. I will:
 - Never install a library outside this stack without asking first
 - Explain tradeoffs before adding anything new
-- Flag if a requirement arises that the stack cannot serve
+- Flag if a requirement arises the stack cannot serve
+- Create AGENTS.md now with the approved structure
 ```
+
+Create `AGENTS.md` immediately after approval using the template in `core.md` §2.A.
 
 ---
 
 ## TS2. Library Selection Reasoning Matrix
 
-When a new library is needed mid-project, or when choosing between alternatives, use this reasoning framework. Never pick by familiarity alone.
-
 ### TS2.1 Library addition checklist
 
 Before proposing any new library:
 
-1. **Does the existing stack already solve this?** Check TanStack Query, Zustand, Zod, shadcn, Tailwind utilities, and native browser APIs first.
+1. **Does the existing stack already solve this?** Check TanStack Query, Zustand, Zod, shadcn, Tailwind, native browser APIs first.
 2. **Is this a one-time need?** Write it in-house if < 50 lines and no edge cases.
-3. **What is the bundle cost?** Check bundlephobia.com. Flag any addition > 20KB gzipped.
-4. **Is it maintained?** Check last commit, open issues, npm weekly downloads. Flag anything with < 10K weekly downloads or last commit > 6 months ago.
-5. **Does it conflict with the React Compiler?** Libraries that manually manage memoization may fight the compiler.
+3. **Bundle cost?** Check bundlephobia.com. Flag > 20KB gzipped.
+4. **Maintained?** Last commit, open issues, weekly downloads. Flag < 10K weekly or last commit > 6 months.
+5. **React Compiler compatible?** Libraries that manually manage memoization may conflict.
 
 ### TS2.2 Standard tradeoff tables
 
-**State management — when to use what:**
+**State management:**
 
 | Situation | Solution | Reason |
 |---|---|---|
-| Component-local UI state (toggle, input value) | `useState` | No overhead, compiler-optimized |
-| Computed from other state | Derived (no new state) | Avoid sync bugs |
-| Shared between sibling components | Lift to parent | Simple, no library needed |
+| Component-local UI state | `useState` | No overhead |
+| Computed from other state | Derived | Avoid sync bugs |
+| Shared between siblings | Lift to parent | No library |
 | Shared across a feature (2–5 components) | React Context + custom hook | No library overhead |
-| URL-persistent state (filters, pagination, tabs) | `nuqs` | Shareable, back-button safe |
-| Global client state (user prefs, cart, session UI) | Zustand | Minimal, compiler-compatible |
-| Server state (API data, loading, caching) | TanStack Query | Purpose-built, never useState for this |
-| Server state + real-time | TanStack Query + WebSocket skill | Combine, do not replace |
+| URL-persistent state | `nuqs` | Shareable, back-button safe |
+| Global client state | Zustand | Minimal, compiler-compatible |
+| Server state | TanStack Query | Purpose-built, never useState |
+| Server state + real-time | TanStack Query + WebSocket skill | Combine, not replace |
 
-**Data fetching — when to use what:**
+**Data fetching:**
 
-| Situation | Solution | Reason |
-|---|---|---|
-| Any data from an API | TanStack Query | Caching, deduplication, stale-while-revalidate |
-| Mutations (POST/PUT/DELETE) | TanStack Query `useMutation` | Integrated with query invalidation |
-| One-off fetch with no caching needed | TanStack Query with `staleTime: Infinity` | Still consistent — don't use useEffect |
-| GraphQL API | TanStack Query + fetch (or Apollo if schema is complex) | Apollo only for large schemas with fragments |
-| Real-time / push | react-realtime skill | WebSocket/SSE — different pattern |
+| Situation | Solution |
+|---|---|
+| Any API data | TanStack Query |
+| Mutations | TanStack Query `useMutation` |
+| One-off, no caching | TanStack Query `staleTime: Infinity` |
+| GraphQL | TanStack Query + fetch (Apollo only for large schemas) |
+| Real-time | react-realtime skill |
 
-**Routing — when to use what:**
+**Routing:**
 
-| Situation | Solution | Reason |
-|---|---|---|
-| Standard SPA | React Router v7 | Stable, data router API, file-based routing available |
-| Type-safe routes, search params as types | TanStack Router | Superior TS integration, but more setup |
-| Next.js project | App Router (built-in) | Not a separate library |
+| Situation | Solution |
+|---|---|
+| Standard SPA | React Router v7 |
+| Type-safe routes + search params | TanStack Router |
+| Next.js | App Router (built-in) |
 
-**Validation — when to use what:**
+**Validation:** Zod always. `z.infer<typeof schema>` as type source of truth. Yup rejected (weaker TS inference).
 
-| Situation | Solution | Reason |
-|---|---|---|
-| Form validation | Zod (schema-first) | Single source of truth for types + validation |
-| API response validation | Zod | Same schema reuse |
-| Runtime type guards | Zod `.safeParse()` | Preferred over manual type narrowing |
-| Complex custom rules | Zod `.superRefine()` | Extend inline, no separate library |
-| Alternative considered | Yup | Rejected — Zod has better TS inference and tree-shaking |
-| Alternative considered | Valibot | Smaller, but less ecosystem. Acceptable if bundle size is critical |
+**Animation:** CSS transitions for state changes. `motion` library for orchestration. GSAP only for complex timelines.
 
-**Animation — when to use what:**
+**Date/time:** `date-fns` v4. Never `moment.js` (deprecated, 72KB).
 
-| Situation | Solution | Reason |
-|---|---|---|
-| Simple state transitions (hover, active, open/close) | CSS transitions via Tailwind | No JS, compiler-friendly |
-| Component mount/unmount animations | `motion` library (`motion/react`) | Purpose-built, uses WAAPI |
-| Scroll-triggered reveals | `motion` with `whileInView` | Clean API |
-| Complex orchestrated sequences | `motion` with `AnimatePresence` | Handles exit animations correctly |
-| High-performance canvas/WebGL | Custom `requestAnimationFrame` | Libraries add overhead |
-| Alternative considered | Framer Motion (old name) | Same library — just renamed to `motion` |
-| Alternative considered | GSAP | Overkill unless doing complex timeline animations |
-
-**Date/time — when to use what:**
-
-| Situation | Solution | Reason |
-|---|---|---|
-| Date formatting, parsing, arithmetic | `date-fns` v4 | Tree-shakable, functional |
-| Timezone-aware dates | `date-fns-tz` | Pair with date-fns |
-| Alternative considered | `dayjs` | Acceptable but less TS coverage |
-| Alternative considered | `moment.js` | ❌ Deprecated, huge bundle |
-| Alternative considered | Luxon | Good, but date-fns is lighter |
-
-**Tables — when to use what:**
-
-| Situation | Solution | Reason |
-|---|---|---|
-| Any sortable/filterable table | TanStack Table v8 | Headless, composable, no style lock-in |
-| Virtualized table (1000+ rows) | TanStack Table + TanStack Virtual | Purpose-built combination |
-| Simple read-only table | Plain `<table>` + Tailwind | No library if no interactivity |
-| Alternative considered | AG Grid | Acceptable for enterprise grids, but large bundle |
+**Tables:** TanStack Table v8. With virtualization: + TanStack Virtual.
 
 ---
 
 ## TS3. Stack Profiles
 
-Reference profiles for common project types. These are starting points, not dogma — adapt based on TS1 requirements gathering.
-
 ### Profile A — Minimal (prototype / internal tool)
 ```
-React 19 + Vite + TypeScript strict
-React Router v7
-Tailwind CSS v4
-shadcn/ui
-TanStack Query v5 (if API exists)
-Zod (always)
-Storybook + addon-mcp (dev, optional — ask user)
+React 19 + Vite + TypeScript strict + React Router v7
+Tailwind CSS v4 + shadcn/ui + TanStack Query v5 + Zod
+Architecture: Type-Based (if small utility) or Feature-Based (if multi-domain)
 ```
 
 ### Profile B — Standard product (SaaS / dashboard)
 ```
-Profile A, plus:
-Zustand v5 (if global state needed)
-nuqs (URL state)
-react-hook-form
-motion library (animations)
-Sentry (error tracking)
-Storybook + addon-mcp (dev, recommended — ask user)
+Profile A + Zustand v5 + nuqs + react-hook-form + motion + Sentry
+Architecture: Feature-Based (recommended for 3+ domains)
 ```
 
 ### Profile C — Data-heavy (admin / analytics)
 ```
-Profile B, plus:
-TanStack Table v8
-TanStack Virtual v3
-Recharts
-date-fns v4
+Profile B + TanStack Table v8 + TanStack Virtual v3 + Recharts + date-fns v4
+Architecture: Feature-Based
 ```
 
 ### Profile D — Real-time (collaboration / live feed)
 ```
-Profile B, plus:
-WebSocket client (native or socket.io)
-Zustand for optimistic state
-→ react-realtime skill
+Profile B + WebSocket client + Zustand for optimistic state
+Architecture: Feature-Based + react-realtime skill
 ```
 
 ---
 
 ## TS4. Library Veto Rules
 
-The following are permanently banned regardless of user request. If a user requests one, apply the standard pushback protocol (decline → explain why → propose alternative).
-
 | Banned | Reason | Alternative |
 |---|---|---|
-| `moment.js` | 72KB gzipped, deprecated | `date-fns` v4 |
-| `jQuery` | Superseded by modern DOM APIs and React | React + native APIs |
-| `lodash` (full import) | Imports entire library | Named imports or native JS |
-| `axios` in new projects | `fetch` is now baseline | Native `fetch` wrapped in `lib/api.ts` |
-| `class-validator` | Runtime-only, no type inference | `zod` |
-| `react-query` (v3/v4 package name) | Use `@tanstack/react-query` v5 | TanStack Query v5 |
-| `framer-motion` (old package) | Renamed — wrong package | `motion` (new package name) |
-| `styled-components` / `emotion` | CSS-in-JS fights React Compiler | Tailwind CSS |
-| `Redux` / `Redux Toolkit` | Overkill for 99% of apps in 2026 | Zustand |
+| `moment.js` | 72KB, deprecated | `date-fns` v4 |
+| `jQuery` | Superseded | React + native APIs |
+| `lodash` (full import) | Imports all | Named imports or native JS |
+| `axios` | `fetch` is baseline | Native `fetch` in `lib/api.ts` |
+| `class-validator` | No type inference | `zod` |
+| `react-query` (v3/v4 name) | Wrong package | `@tanstack/react-query` v5 |
+| `framer-motion` (old) | Renamed | `motion` package |
+| `styled-components` / `emotion` | Fights React Compiler | Tailwind CSS |
+| `Redux` / `Redux Toolkit` | Overkill for 99% of 2026 apps | Zustand |
 
 **Pushback script:**
-> *"[Library] is on the permanently banned list — [reason]. The standard replacement is [alternative] which achieves the same goal without [the cost]. Should I proceed with [alternative]?"*
+> *"[Library] is permanently banned — [reason]. The replacement is [alternative]. Should I proceed with that?"*
 
 ---
 
 ## TS5. Dependency Addition Protocol (mid-project)
 
-When a new library is needed during development:
-
-1. **Stop before installing.** State: *"I need [library] to implement [feature]. Let me check if this is justified."*
-2. Run TS2.1 checklist mentally.
-3. Propose: *"I'd like to add [library] for [reason]. Bundle impact: ~[X]KB. It's maintained (last commit [N], [M]K weekly downloads). Alternative would be [Y], which I'm rejecting because [reason]. Approve?"*
-4. Only install after approval.
-5. Document in `versions.lock.md` with the reason it was added.
+1. **Stop.** State: *"I need [library] for [feature]. Let me verify this is justified."*
+2. Run TS2.1 checklist.
+3. Propose: *"Bundle: ~[X]KB. Maintained: yes (last commit [N], [M]K weekly). Alternative [Y] rejected because [reason]. Approve?"*
+4. Install only after approval. Document in `LIBRARY_LEDGER.md`.
 
 ---
 
-## Summary Cheatsheet
+## Summary
 
 | Situation | Action |
 |---|---|
-| New project | TS1 proposal → user approval → begin |
-| Need a new library | TS2.1 checklist → propose with reasoning → wait for approval |
-| User requests a banned library | Pushback: decline → explain → propose alternative |
-| Choosing between two similar libraries | TS2.2 tradeoff tables → state choice + why not the other |
-| Existing stack covers the need | State that explicitly — do not add a library |
+| New project | TS1 proposal (incl. architecture choice) → approval → create AGENTS.md → begin |
+| New library | TS2.1 checklist → propose → wait for approval |
+| Banned library requested | Decline → explain → propose alternative |
+| Choosing between two libraries | TS2.2 tables → state choice + why not the other |
+| Existing stack covers the need | State explicitly — no new library |

@@ -18,124 +18,82 @@ AI agents have no persistent memory between sessions. Without explicit context m
 - It builds feature N+1 on top of unverified feature N
 - The codebase drifts into inconsistency
 
-This rule prevents all of that. It is the operating protocol for every multi-session, multi-feature project.
+This rule prevents all of that.
 
 ---
 
 ## PC1. Session Start Protocol
 
-At the start of any coding session, state the project context before doing anything else.
+State project context before doing anything else.
 
-### If context was established in a previous session:
-
+### If context was established previously:
 ```
 ## Session context — [Project name]
-
 Stack: [approved stack from tech-stack.md TS1]
+Architecture: [Feature-Based | Type-Based]
 Last verified state: [what was working at end of last session]
 Current feature: [what we are building now]
 Pending features: [what comes after]
-
-Starting from: [file / component / route we are working on]
+Starting from: [file / component / route]
 ```
 
-If the user does not provide context at session start, ask:
+If the user does not provide context: *"Before we begin — can you confirm the current state? What was the last working feature, and what are we building today?"*
 
-> *"Before we begin — can you confirm the current state? What was the last working feature, and what are we building today?"*
-
-### If this is a new project:
-
-Run the TS1 stack proposal protocol from `tech-stack.md` first. Do not write any code until the stack is approved and the first feature is defined.
+### If new project: run TS1 stack proposal first. No code until stack is approved.
 
 ---
 
 ## PC2. Feature Definition
 
-Before implementing any feature, define it precisely. A feature is too vague to implement if it cannot be described in one sentence with a clear completion condition.
+A feature is too vague to implement if it can't be described in one sentence with a clear completion condition.
 
 ```
 Feature: [name]
 Description: [one sentence — what it does, from the user's perspective]
-Scope:
-  - [specific component / route / hook it involves]
-  - [API endpoint(s) it calls, if any]
-  - [state it reads or writes]
-Out of scope for this feature:
-  - [things that are tempting but belong in a later feature]
+Scope: [components, routes, hooks, API endpoints involved]
+Out of scope: [tempting things that belong in a later feature]
 Done when:
   - [verifiable condition 1]
-  - [verifiable condition 2]
   - [TypeScript compiles with zero errors]
-  - [no console errors or warnings in the browser]
+  - [no console errors in the browser]
 ```
-
-If the user's request is ambiguous, clarify before proceeding:
-
-> *"Before I build [feature], I want to confirm scope. Should [ambiguous thing] be included, or is that a separate feature?"*
 
 ---
 
 ## PC3. Incremental Implementation Protocol
 
-### The core rule
-
 **One feature. Fully complete. Verified. Then the next.**
 
-Never implement features in parallel. Never skip the verification gate. Never start feature N+1 if feature N has unresolved TypeScript errors, missing states (loading/error/empty), or untested interactions.
-
-### Implementation sequence (per feature)
-
+Implementation sequence per feature:
 ```
-1. Define the feature using PC2 structure — confirm with user
-2. Identify all files that need to change — list them before touching any
-3. Implement in dependency order:
-     types.ts → utils.ts → hooks → components → routes → tests
-4. After each file: run tsc --noEmit — zero errors required before continuing
-5. After all files: run the full import verification from core.md §0
-6. Present to user: "Feature [X] is complete. Here's what was built: [summary]"
-7. Wait for validation confirmation before starting the next feature
+1. Define with PC2 — confirm with user
+2. List all files that need to change before touching any
+3. Implement in dependency order: types → utils → hooks → components → routes → tests
+4. After each file: run tsc --noEmit — zero errors before continuing
+5. After all files: run import verification from core.md
+6. Present: "Feature [X] complete. Here's what was built: [summary]"
+7. Wait for validation confirmation before starting next feature
 ```
 
-### Dependency order rule
+**Dependency order:** data shapes → data access → UI. Never a component before its hook. Never a hook before its type.
 
-Never implement a component before the hook it depends on. Never implement a hook before the type it consumes. The build order is always: data shapes → data access → UI.
-
-```
-❌ Wrong order:
-   Component (needs hook) → Hook (needs type) → Type
-
-✅ Correct order:
-   Type → Hook → Component
-```
-
-### The 3+ feature rule
-
-When a task has 3 or more features:
-
-1. List the full implementation sequence in dependency order — get user confirmation on the order before writing any code
-2. Implement feature 1 completely through all validation gates
-3. Present feature 1 to the user: *"Feature 1 complete and verified. Starting feature 2: [description]. Confirm?"*
-4. Only proceed after confirmation
-5. Repeat for each feature
+**3+ features:** List full sequence → get confirmation on order → implement one at a time with gates.
 
 ---
 
 ## PC4. Validation Gates
 
-A feature is not complete until all gates pass. Never mark a feature done with outstanding gates.
+A feature is **not complete** until ALL applicable gates pass.
 
 ### Gate 1 — TypeScript
 ```bash
-npx tsc --noEmit
-# Required: zero errors
+npx tsc --noEmit   # zero errors required
 ```
 
 ### Gate 2 — Import resolution
 ```bash
-# Every @/components/ui/ import must resolve to a real file
 grep -rh "from '@/components/ui/" src/ \
-  | grep -oP "(?<=ui/)[^'\"]+" \
-  | sort -u \
+  | grep -oP "(?<=ui/)[^'\"']+" | sort -u \
   | while read comp; do
       [ ! -f "src/components/ui/${comp}.tsx" ] && echo "MISSING: ${comp}.tsx"
     done
@@ -143,68 +101,125 @@ grep -rh "from '@/components/ui/" src/ \
 ```
 
 ### Gate 3 — All states implemented
-For every new UI component, verify:
 - [ ] Loading state (skeleton or spinner per `ux-interaction` UX3.2)
 - [ ] Error state (with recovery action)
 - [ ] Empty state (distinct from error — see `ux-interaction` UX4)
 - [ ] Success / populated state
 
 ### Gate 4 — Accessibility baseline
-- [ ] All interactive elements are keyboard-focusable
+- [ ] All interactive elements keyboard-focusable
 - [ ] No `<div onClick>` — semantic HTML only
 - [ ] All images have `alt` text or `alt=""`
 - [ ] Color is not the only status indicator
 
 ### Gate 5 — No console noise
-- [ ] Zero `console.error` or `console.warn` in the browser
-- [ ] No React key warnings
-- [ ] No unhandled promise rejections
+- [ ] Zero `console.error` / `console.warn` in browser
+- [ ] No React key warnings. No unhandled promise rejections.
 
 ### Gate 6 — Build passes
 ```bash
-npm run build
-# Required: zero errors, zero type errors
+npm run build   # zero errors required
 ```
 
-If any gate fails: fix it before proceeding. Never present an unfinished feature as complete.
+### Gate 7 — Lighthouse CI (when configured)
+```bash
+npx lhci autorun   # all thresholds must pass
+# LCP < 2.5s | INP < 200ms | CLS < 0.1
+```
+If Lighthouse CI is not configured yet: record the missing gate in DECISION_LOG.md as a follow-up action.
+
+### Gate 8 — Visual regression (when Storybook is installed)
+- [ ] New component has a co-located `.stories.tsx` file with all required variants
+- [ ] Chromatic run passes (or visual diff is accepted by user)
+
+If any gate fails: fix before proceeding. Never present an unfinished feature as complete.
 
 ---
 
 ## PC5. Scope Creep Prevention
 
-During implementation, if you discover that a clean implementation of feature N requires also building what would logically be feature N+1:
+If implementing feature N cleanly requires feature N+1:
 
-1. **Do not silently expand scope.** State: *"To implement [feature N] cleanly, I would also need [feature N+1 thing]. Should I include it now, or stub it and come back?"*
-2. If the user says include it: update the feature definition (PC2) and the pending feature list.
-3. If the user says stub it: implement a clean interface that can be filled in later — no inline TODOs without a ticket reference.
+1. **Do not silently expand scope.** State: *"To implement [N] cleanly, I also need [N+1 thing]. Include now or stub?"*
+2. If include: update PC2 definition and pending feature list.
+3. If stub: clean interface, no inline TODOs without a ticket reference.
 
 ---
 
 ## PC6. Context Refresh After Long Sessions
 
-After 10+ back-and-forth exchanges on a complex feature, proactively re-state the context:
+After 10+ exchanges on a complex feature, proactively re-state:
 
-> *"Quick context check: we are building [feature], we have completed [X, Y, Z], and the remaining work is [A, B]. Still correct?"*
-
-This prevents drift where the agent starts solving a slightly different problem than the one originally defined.
+> *"Quick context check: building [feature], completed [X, Y, Z], remaining [A, B]. Still correct?"*
 
 ---
 
 ## PC7. Definition of Done
 
-A project feature is done when — and only when:
-
 | Criterion | How to verify |
 |---|---|
-| All acceptance criteria from PC2 are met | Review PC2 "Done when" list |
-| TypeScript compiles cleanly | `npx tsc --noEmit` — zero errors |
+| All acceptance criteria from PC2 met | Review "Done when" list |
+| TypeScript compiles cleanly | `npx tsc --noEmit` |
 | All UI states implemented | Gate 3 checklist |
 | Accessibility baseline met | Gate 4 checklist |
 | No console noise | Gate 5 checklist |
-| Production build passes | `npm run build` — zero errors |
-| User has confirmed it works | Explicit user sign-off |
+| Production build passes | `npm run build` |
+| Lighthouse CI passes (if configured) | Gate 7 |
+| Visual regression passes (if Storybook) | Gate 8 |
+| User has confirmed it works | Explicit sign-off |
 
-"It looks right" is not done. "It compiles" is not done. Done is all seven criteria, verified.
+---
+
+## PC8. Session Handoff & Context Window Protocol
+
+### 8.1 — Context utilisation checkpoint
+
+When a session exceeds **30 tool calls** OR when approaching a long pause, proactively write state to files:
+
+1. Ensure `DECISION_LOG.md` has an entry for every architectural decision made this session.
+2. Update `AGENTS.md` if any banned patterns or conventions were added.
+3. State: *"Context checkpoint written. Continuing."*
+
+### 8.2 — 85% context window rule
+
+If you detect (via response quality degradation, difficulty recalling earlier decisions, or explicit context warning) that the context window is approaching capacity:
+
+**STOP immediately and do all of the following before any more code:**
+
+1. Write a handoff document at the project root: `HANDOFF.md`
+
+```markdown
+# Session Handoff — [date]
+
+## Status
+[In progress | Blocked | Complete — be specific]
+
+## Files Changed This Session
+- [file path] — [what changed and why]
+
+## Decisions Made
+- [decision] — [rationale] — see DECISION_LOG.md [entry name]
+
+## Blocked On
+- [blocker] — [what is needed to unblock]
+
+## Next Steps (in order)
+1. [specific next action]
+2. [specific next action]
+
+## Danger Zones
+- [anything partially implemented that could break if touched wrong]
+```
+
+2. Run `tsc --noEmit` — if it fails, note the errors in HANDOFF.md.
+3. Tell the user: *"Context window is near capacity. I've written a handoff document at HANDOFF.md. Starting a new session with that document will restore full context. Should I continue or start fresh?"*
+
+### 8.3 — Multi-session resume
+
+At the start of any session on a project with a `HANDOFF.md`:
+1. Read `HANDOFF.md` fully before reading any other file.
+2. State the status from the handoff before asking what to do next.
+3. Delete `HANDOFF.md` after the user confirms the context is correct.
 
 ---
 
@@ -212,9 +227,11 @@ A project feature is done when — and only when:
 
 | Situation | Action |
 |---|---|
-| Session start | State current context — stack, last verified state, current feature |
-| New feature request | Define with PC2 structure, confirm scope, then implement |
+| Session start | State context — stack, architecture, last verified state, current feature |
+| New feature | PC2 define → confirm → implement → all gates |
 | 3+ features | List sequence → confirm order → one at a time with gates |
-| Gate fails | Fix before proceeding — never move on with broken gates |
-| Scope expands | State it explicitly, get approval, update the feature list |
-| Feature feels done | Run all 6 gates — if all pass, present to user for sign-off |
+| Gate fails | Fix before proceeding |
+| Scope expands | State explicitly, get approval, update feature list |
+| 30+ tool calls | Write decisions to files (PC8.1) |
+| Context at capacity | Write HANDOFF.md, stop, inform user (PC8.2) |
+| Session resumes | Read HANDOFF.md first (PC8.3) |
