@@ -113,7 +113,8 @@ Before writing code, evaluate the feature through ALL of these lenses. For each,
 
 ### Context & Session Continuity (new lens)
 - Does this feature span multiple sessions or produce architectural decisions?
-- If yes: is the decision being written to DECISION_LOG.md before this session ends?
+- If yes: are decisions being retained via Hindsight `retain` (or DECISION_LOG.md) before this session ends?
+- Does Hindsight MCP have relevant prior cross-agent context? → `recall` before building (see mcp-servers.md)
 - Does this feature require a state handoff format for async work?
 
 ---
@@ -175,9 +176,12 @@ For each Phase 5 scenario, name the MSW handler configuration and assertion that
 
 ---
 
-## Phase 7 — Update DECISION_LOG.md
+## Phase 7 — Retain Memory / Update Records
 
-If this task produced a new architectural decision (library chosen, pattern established, constraint surfaced), update `DECISION_LOG.md` now. Replace changed entries — do not append.
+If this task produced a new architectural decision (library chosen, pattern established, constraint surfaced):
+1. **Retain** the memory via Hindsight MCP (`retain` tool) to update the project bank.
+2. If Hindsight is unavailable, update `DECISION_LOG.md` (replace changed entries — do not append).
+If no architectural decision was made, skip this phase.
 
 ---
 

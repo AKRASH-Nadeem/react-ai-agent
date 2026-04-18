@@ -32,24 +32,26 @@ This rule provides:
 
 ---
 
-## Part 1 — DECISION_LOG.md: The Agent's Memory
+## Part 1 — Hindsight MCP & DECISION_LOG.md: The Agent's Memory
 
 ### What it is
 
-DECISION_LOG.md lives alongside LIBRARY_LEDGER.md in the project.
-It is not LIBRARY_LEDGER.md (which captures *what* is installed and why).
-It is not a changelog (which records *what changed* over time).
+Hindsight MCP (via `retain`/`recall` tools) is the primary memory system.
+DECISION_LOG.md lives alongside LIBRARY_LEDGER.md in the project as a fallback.
+These are not APP_STATE.md (which captures *what* the system is now), nor are
+they changelogs (which record *what changed* over time).
 
-It captures **why the frontend is architected the way it is**:
-what patterns were chosen, what was rejected, what constraints existed,
-and what would cause us to revisit a decision.
+They capture **why the codebase is the way it is**:
+what was chosen, what was rejected, what constraints existed at decision time,
+and what would cause us to revisit the decision.
 
-This is the document that makes pushback intelligent rather than reflexive.
+This is the memory that makes pushback intelligent rather than reflexive.
 
-### When to create it
+### When to write to memory
 
 On the first architectural decision in any project session.
-If DECISION_LOG.md doesn't exist and a decision is being made, create it first.
+If Hindsight is connected, use the `retain` tool.
+If Hindsight is unavailable and DECISION_LOG.md doesn't exist, create it first.
 
 ### What triggers an update
 
