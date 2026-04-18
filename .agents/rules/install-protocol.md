@@ -21,6 +21,8 @@ Before writing any install command or library code, call Context7.
 
 **Why:** Package names, CLI flags, and setup steps change between versions. Training memory may reflect a version that is 6–18 months old. Context7 gives the current docs.
 
+**Exempt from Context7:** React core hooks (useState, useEffect, useRef, useContext, etc.) — these are stable. Only external packages require Context7.
+
 ### Query patterns
 
 ```
@@ -93,6 +95,23 @@ immediately — before any code is written:
 
 No user prompt needed to trigger this — it is automatic whenever
 installed major ≠ skill `requires:` major.
+
+### Step 2.75 — Pre-install validation (CLI)
+
+Before running `npm install`, run these checks directly:
+
+```bash
+# Check bundle size impact
+npm view [package-name] dist.unpackedSize
+
+# Check maintenance health (last publish date)
+npm view [package-name] time.modified
+
+# Check for known vulnerabilities
+npm audit --json
+```
+
+**Block install if:** critical vulnerability found OR bundle size > 50KB gzipped for a utility library. Report to user with alternatives.
 
 ### Step 3 — Install missing packages via Context7
 
@@ -188,13 +207,63 @@ When initialising a new project, install and configure in this exact order. Each
 4. shadcn                     npx shadcn@latest init (never write components.json by hand)
 5. Core runtime               TanStack Query, React Router, Zod — Context7 each before installing
 6. Feature libs               Install only what activated skills require — Context7 each
-7. Dev tooling                ESLint, Prettier, Husky (optional)
-8. Verify                     npm run build — must succeed with zero errors before any feature work
+7. Dev tooling                ESLint, Prettier, Vitest — Context7 each
+8. Storybook (opt-in only)    ASK USER → if yes, see IP4.1. If no/silent → skip entirely.
+9. Verify                     npm run build — must succeed with zero errors before any feature work
 ```
 
-Write a ledger entry for every install in steps 1–7. The ledger exists before the first `npm install` runs.
+Write a ledger entry for every install in steps 1–8. The ledger exists before the first `npm install` runs.
 
-**Never skip step 8.** A green build after scaffolding is the non-negotiable baseline. Fix any build errors before starting feature work.
+**Never skip step 9.** A green build after scaffolding is the non-negotiable baseline. Fix any build errors before starting feature work.
+
+---
+
+### IP4.1 — Storybook Setup (Step 8 — opt-in only)
+
+**New project — always ask first. Never install without explicit consent:**
+> "Would you like me to set up Storybook for component-driven development? It enables isolated component development, visual testing, and the Storybook MCP for AI-assisted component discovery. Dev dependency only — zero production impact. Requires Storybook v8.3+."
+
+- If user says **yes** → proceed with install below
+- If user says **no** or **skip** → skip entirely, do not mention again
+- If user doesn't respond → **do not install**. Never assume consent.
+
+**Existing project — silent detection:**
+```bash
+cat package.json | grep -q "@storybook" && echo "FOUND" || echo "NOT_FOUND"
+```
+- If `FOUND` → Storybook is available. Use Storybook MCP tools when `npm run storybook` is running.
+- If `NOT_FOUND` → fall back to file-system introspection. **Do not suggest installing Storybook** unless the user specifically asks about component development tooling.
+
+**Install commands (when user has approved):**
+```bash
+# Initialize Storybook (auto-detects React + Vite)
+npx storybook@latest init
+
+# Install the MCP addon for AI agent integration (requires Storybook v8.3+)
+npx storybook add @storybook/addon-mcp
+```
+
+**Port configuration:**
+Storybook runs on port `6006` by default. The MCP endpoint is at `http://localhost:6006/mcp`.
+Verify the scripts exist in `package.json`:
+```json
+{
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  }
+}
+```
+
+**Post-install verification:**
+```bash
+# Verify Storybook starts without errors (Storybook 8 syntax)
+npx storybook dev --smoke-test
+```
+
+> ⚠️ Note: The `--smoke-test` flag was introduced in Storybook 8. If the project uses Storybook 7, use `npm run storybook -- --ci` instead.
+
+**Ledger entry required:** Log Storybook and `@storybook/addon-mcp` as dev-only packages using LL2 format with `Status: Dev dependency`.
 
 ---
 
@@ -214,7 +283,7 @@ When working with these, always fetch the migration guide via Context7 — do no
 
 | Package | What changed |
 |---------|-------------|
-| `tailwindcss` v3 → v4 | No `tailwind.config.ts`. Config in CSS. `@tailwind` directives replaced by `@import "tailwindcss"`. |
+| `tailwindcss` v3 → v4 | No `tailwind.config.ts`. Config in CSS. `@tailwind` directives replaced by `@import "tailwindcss"`. `tw-animate-css` replaces `tailwindcss-animate`. |
 | `msw` v1 → v2 | `rest.*` replaced by `http.*`. `ctx.*` helpers replaced by `HttpResponse`. Worker init changed. |
 | `framer-motion` → `motion` | Package renamed. Import from `motion/react` not `framer-motion`. |
 | `@sentry/react` v7 → v8 | Init API changed. `BrowserTracing` import path moved. |

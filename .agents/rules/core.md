@@ -7,7 +7,7 @@ trigger: always_on
 > **Skill selection is MANDATORY before any task.** Run the skill-dispatcher check from `skill-dispatcher.md` FIRST — before Phase 0, before any reasoning, before any code.
 > `react-tailwind` + `react-shadcn` + `design-philosophy` always load on every UI task. All other skills: scan the registry in `skill-dispatcher.md`, READ every match, then state: `Active skills: react-tailwind + react-shadcn + design-philosophy + [others loaded]`
 >
-> MCP: Call Context7 before writing any code that touches a library or framework. Never generate library code from memory.
+> MCP: Call Context7 before writing any code that touches an EXTERNAL library or framework. React core hooks (useState, useEffect, useRef, useContext, useReducer, useId, use()) are stable and exempt. For all other libraries: Context7 first, no exceptions.
 
 ---
 
@@ -20,7 +20,7 @@ Run this at the start of EVERY session, without exception.
 Check the project root. For each missing file, **CREATE IT NOW** — do not ask, do not wait.
 
 | File | If MISSING | If EXISTS |
-|------|-----------|-----------|
+|------|-----------|-----------| 
 | `LIBRARY_LEDGER.md` | Create with header from `library-ledger.md` LL1, then backfill from `package.json` using LL7 format | Read the summary table |
 | `DECISION_LOG.md` | Create: `# Decision Log\n_Created: [date]_` header | Read fully — flag any conflict with the current request |
 | `.env.example` | Create empty — populate as VITE_ vars are discovered | Read to understand current env var shape |
@@ -79,6 +79,11 @@ After confirming accessibility requirements are met, before writing JSX:
 3. What is the one thing a user will remember?
 
 Apply the **design-philosophy** skill for all visual decisions — subject to §0.A precedence.
+
+**Skill precedence when both design skills load:**
+- `design-philosophy` governs the system: OKLCH tokens, contrast ratios, banned patterns (D2), color system (D3–D4). These are non-negotiable floors.
+- `frontend-design` governs creative execution: tone direction, composition, atmosphere, and visual boldness. Works within design-philosophy constraints.
+- When they appear to conflict: design-philosophy wins on system rules, frontend-design wins on creative choices within those rules.
 
 ---
 
@@ -250,7 +255,7 @@ See §0.A. Advanced patterns → **react-accessibility** skill.
 ## 18. Testing
 
 Test behavior, not implementation.
-- Unit: Vitest; Component: React Testing Library; E2E: Playwright
+- Unit: Vitest; Component: React Testing Library; E2E: Antigravity's built-in browser agent
 - Mock APIs with MSW. Test all states: loading, error, empty, success.
 - Full setup → **react-testing** skill.
 
@@ -274,7 +279,7 @@ Test behavior, not implementation.
 
 ## 21. MCP Usage
 
-Full priority order → **`mcp-servers.md`** (always-on rule). Context7 before any library code. shadcn MCP before any shadcn component.
+Full priority order → **`mcp-servers.md`** (always-on rule). Context7 before any external library code (React built-ins exempt). shadcn MCP before any shadcn component.
 
 ---
 

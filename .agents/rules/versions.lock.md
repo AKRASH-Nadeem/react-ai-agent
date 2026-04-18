@@ -92,6 +92,8 @@ Context7 provides the exact method names and imports for your installed version.
 
 ---
 
+## Core Framework
+
 | Package | Baseline | Notes |
 |---------|----------|-------|
 | `react` | `^19.0.0` | React Compiler enabled |
@@ -217,9 +219,19 @@ Context7 provides the exact method names and imports for your installed version.
 | `msw` | `^2.6.0` | v2 — `rest.*` replaced by `http.*` |
 | `jest-axe` | `^9.0.0` | |
 | `@types/jest-axe` | `^3.5.0` | |
-| `@playwright/test` | `^1.49.0` | |
 
 > ⚠️ **MSW v2 breaking changes:** `rest.get/post` replaced by `http.get/post`, `ctx.*` replaced by `HttpResponse`. Do not apply v2 patterns to a v1 project.
+
+---
+
+## Component Development (Dev Only)
+
+| Package | Baseline | Notes |
+|---------|----------|-------|
+| `storybook` | `^8.3.0` | Requires 8.3+ for `@storybook/addon-mcp` support |
+| `@storybook/addon-mcp` | `^8.3.0` | Enables `http://localhost:6006/mcp` endpoint for AI agent access |
+
+> Storybook is **always a dev dependency** and always **requires explicit user opt-in**. See `install-protocol.md` IP4.1. Never install without confirmation.
 
 ---
 

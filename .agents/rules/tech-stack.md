@@ -68,6 +68,7 @@ Present using this exact structure:
 | Real-time      | Socket.io client    | If WebSocket is needed          |
 | Auth           | Clerk / Auth.js     | If auth is required             |
 | Charts         | Recharts            | If data viz is required         |
+| Component dev  | Storybook + addon-mcp (dev) | Recommended — user must opt in |
 
 ### What I deliberately excluded and why
 - [Library X] — [reason it was considered and rejected]
@@ -194,6 +195,7 @@ Tailwind CSS v4
 shadcn/ui
 TanStack Query v5 (if API exists)
 Zod (always)
+Storybook + addon-mcp (dev, optional — ask user)
 ```
 
 ### Profile B — Standard product (SaaS / dashboard)
@@ -204,6 +206,7 @@ nuqs (URL state)
 react-hook-form
 motion library (animations)
 Sentry (error tracking)
+Storybook + addon-mcp (dev, recommended — ask user)
 ```
 
 ### Profile C — Data-heavy (admin / analytics)

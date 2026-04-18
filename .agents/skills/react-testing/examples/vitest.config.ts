@@ -58,6 +58,6 @@ export default defineConfig({
 
     // Test file patterns
     include: ["src/**/*.test.{ts,tsx}", "src/**/*.spec.{ts,tsx}"],
-    exclude: ["e2e/**", "node_modules/**"],
+    exclude: ["node_modules/**"],
   },
 });

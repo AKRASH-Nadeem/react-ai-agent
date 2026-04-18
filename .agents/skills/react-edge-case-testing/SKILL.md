@@ -9,8 +9,8 @@ description: |
 
 # React — Failure-First Reasoning & Edge-Case Testing Philosophy
 
-> FIRST: Use Context7 to verify current React Testing Library, Vitest, MSW,
-> and Playwright patterns before writing any test infrastructure.
+> FIRST: Use Context7 to verify current React Testing Library, Vitest, and MSW
+> patterns before writing any test infrastructure.
 
 ---
 
@@ -271,7 +271,7 @@ is what makes tests useful.
 ## Relationship to react-testing
 
 `react-testing`: how to set up Vitest, configure MSW, write test
-structure, use renderHook, run Playwright E2E.
+structure, use renderHook.
 
 `react-edge-case-testing`: what to test and how to think about whether
 the right things have been tested.
