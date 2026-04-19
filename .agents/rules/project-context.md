@@ -176,7 +176,7 @@ After 10+ exchanges on a complex feature, proactively re-state:
 
 When a session exceeds **30 tool calls** OR when approaching a long pause, proactively write state to files:
 
-1. Ensure Hindsight `retain` has been called for every architectural decision made this session (or `DECISION_LOG.md` has an entry if Hindsight is unavailable).
+1. Ensure all architectural decisions are written to `DECISION_LOG.md`, then call Memvid `memvid_put { "input": "/home/ak/.../DECISION_LOG.md", "file": ".memvid/shared.mv2" }` to sync it.
 2. Update `AGENTS.md` if any banned patterns or conventions were added.
 3. State: *"Context checkpoint written. Continuing."*
 

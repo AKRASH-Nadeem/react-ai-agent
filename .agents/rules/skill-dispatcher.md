@@ -46,7 +46,7 @@ READ: .agents/skills/design-philosophy/SKILL.md
 | `.agents/skills/react-troubleshooting/SKILL.md` | not working, weird behavior, useEffect running twice, stale closure, too many re-renders, hydration error, white screen, layout shift |
 | `.agents/skills/react-typescript-advanced/SKILL.md` | TypeScript, type definitions, generics, discriminated unions, type safety, satisfies, infer, conditional types, unknown vs any, component typing, Zod inference |
 | `.agents/skills/ux-interaction/SKILL.md` | user flow, onboarding, empty state, navigation, IA, modal, toast, confirmation, dashboard layout, UX review |
-| `.agents/skills/hindsight-docs/SKILL.md` | Hindsight memory, recall, retain, reflect, memory bank, document_id, tags, observations, troubleshoot Hindsight, configure memory |
+| `.agents/skills/memvid-docs/SKILL.md` | Memvid memory, memvid_find, memvid_put, memvid_ask, .mv2, memory file, shared memory, cross-agent, embedding, knowledge graph, session, timeline, troubleshoot Memvid, configure memory |
 
 ### 0.3 — Announce loaded skills before proceeding
 
