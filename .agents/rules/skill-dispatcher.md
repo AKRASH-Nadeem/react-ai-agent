@@ -8,6 +8,28 @@ trigger: always_on
 
 ---
 
+## STEP 0.0 — Memvid Recall (runs before skill selection)
+
+> **MANDATORY — Gemini 3 Flash: do NOT skip this even under context pressure.**
+> Memory recall costs 2 tool calls. Missing project context costs hours of wrong direction.
+
+If Memvid MCP is connected, execute BEFORE scanning the skill registry:
+
+```
+memvid_find { "file": "shared.mv2", "query": "[task-relevant keywords]", "mode": "hybrid", "limit": 5 }
+memvid_find { "file": "frontend.mv2", "query": "[task-relevant keywords]", "mode": "hybrid", "limit": 5 }
+```
+
+**Derive the query from the task.** Examples:
+- Building auth UI → `"query": "authentication strategy tokens session frontend"`
+- New component → `"query": "component patterns conventions design system"`
+- State management question → `"query": "state management zustand redux decision"`
+- API integration → `"query": "api contract endpoint error format backend"`
+
+**If Memvid not connected:** Skip to Step 0. Note: "Memvid offline — using DECISION_LOG.md."
+
+---
+
 ## STEP 0 — Skill Selection (runs before everything else)
 
 ### 0.1 — Always load these three first (mandatory on every UI task)
@@ -46,7 +68,7 @@ READ: .agents/skills/design-philosophy/SKILL.md
 | `.agents/skills/react-troubleshooting/SKILL.md` | not working, weird behavior, useEffect running twice, stale closure, too many re-renders, hydration error, white screen, layout shift |
 | `.agents/skills/react-typescript-advanced/SKILL.md` | TypeScript, type definitions, generics, discriminated unions, type safety, satisfies, infer, conditional types, unknown vs any, component typing, Zod inference |
 | `.agents/skills/ux-interaction/SKILL.md` | user flow, onboarding, empty state, navigation, IA, modal, toast, confirmation, dashboard layout, UX review |
-| `.agents/skills/memvid-docs/SKILL.md` | Memvid memory, memvid_find, memvid_put, memvid_ask, .mv2, memory file, shared memory, cross-agent, embedding, knowledge graph, session, timeline, troubleshoot Memvid, configure memory |
+| `.agents/skills/memvid-docs/SKILL.md` | Memvid troubleshooting, configure memory files, knowledge graph, session replay, .mv2 advanced operations, embedding setup |
 
 ### 0.3 — Announce loaded skills before proceeding
 
@@ -63,7 +85,6 @@ Then proceed to Phase 0 of the reasoning protocol.
 **Trigger: new project OR architecture style change OR first session on a project without AGENTS.md.**
 
 ```bash
-# Check at session start
 ls AGENTS.md 2>/dev/null && echo "EXISTS" || echo "MISSING"
 ```
 
@@ -93,12 +114,32 @@ Before writing any layout-level code that USES the new component:
 2. The story must include these variants at minimum: `Default`, `Loading`, `Error`, `Empty`, `Disabled` (if applicable), `RTL` (if i18n in scope).
 3. The a11y addon must be included in the story: `parameters: { a11y: { config: {} } }`.
 
-**If stories do not exist yet:**
-> *"I need to create the Storybook story for [ComponentName] before using it in a layout. This takes ~2 minutes and prevents building on untested component APIs. Proceeding with story creation now."*
-
-**Do not bypass this gate under time pressure.** The gate exists precisely because time pressure is when it matters most.
-
 **If STORYBOOK_ABSENT:** Skip this gate silently — do not suggest installing Storybook unless the user asks.
+
+---
+
+## STEP 0.6 — End-of-Task Memory Mandate
+
+> **Run after every implementation task that produced an architectural decision.**
+> Gemini 3 Flash: do not skip this step. Storage costs 1 tool call. Lost decisions cost sessions.
+
+After any task that establishes a decision, convention, or cross-agent contract:
+
+**1. Store to appropriate .mv2 file:**
+```
+memvid_put {
+  "file": "[frontend.mv2 or shared.mv2]",
+  "input": "[agent:frontend] [type:architectural-decision] [feature:X] [date:YYYY-MM-DD]\nDecision: ...\nWhy: ...\nRejected: ...\nInvalidated by: ...",
+  "embed": true
+}
+```
+
+**2. Route by decision type:**
+| Decision type | File |
+|---|---|
+| Component patterns, state management, routing, styling | `frontend.mv2` |
+| API integration, auth flow, error envelope, WebSocket schema | `shared.mv2` |
+| When in doubt | `shared.mv2` — prefer visibility to both agents |
 
 ---
 
@@ -125,8 +166,8 @@ Skills are not loaded automatically — **you** are the dispatcher. A task proce
 
 **Gemini 3 Flash specific:**
 - Flash is optimized for speed. It will reach for the first plausible answer without completing Step 0. Force-complete Step 0 before any response begins.
+- **Step 0.0 (Memvid recall) and Step 0.6 (end-of-task put) are MANDATORY for Flash.** Flash's speed bias skips memory operations. This is the single biggest source of lost project context. Override it — always.
 - Flash may truncate long instruction sets under context pressure. Mandatory skills (react-tailwind + react-shadcn + design-philosophy) are loaded first because they are in the most reliable part of context.
-- When multiple skills conflict on a detail: apply the precedence note in §0.1. Do not ask the user to resolve internal skill conflicts.
 - Flash may skip §0.4 and §0.5 under pressure. These gates are non-negotiable — execute them even if it feels redundant.
 
 **Claude Sonnet / Opus:**

@@ -22,6 +22,31 @@ trigger: always_on
 | `AGENTS.md` | Create from §2.A template | Read — update if structure changed |
 | `.env.example` | Create empty, populate as VITE_ vars appear | Read for env shape |
 
+---
+
+### Step 1.5 — Memvid Memory Bootstrap
+
+> **MANDATORY — execute before any task. Do not skip under time pressure.**
+> Gemini 3 Flash: this step is non-negotiable even when context is tight.
+
+**1. Init — verify or create .mv2 files:**
+- `memvid_stats { "file": "shared.mv2" }` → if error/missing: `memvid_create { "file": "shared.mv2" }`
+- `memvid_stats { "file": "frontend.mv2" }` → if error/missing: `memvid_create { "file": "frontend.mv2" }`
+
+**2. Start session tracking:**
+- `memvid_session { "file": "frontend.mv2", "start": "fe-[YYYYMMDD-HH]" }`
+
+**3. Recall project context (ALWAYS run both):**
+- `memvid_find { "file": "shared.mv2", "query": "project architecture api contracts auth design system stack", "mode": "hybrid", "limit": 5 }`
+- `memvid_find { "file": "frontend.mv2", "query": "component conventions state management decisions patterns", "mode": "hybrid", "limit": 5 }`
+
+**4. First run (both return empty):** Migrate `DECISION_LOG.md` entries:
+- `memvid_put_many { "file": "frontend.mv2", "input": "DECISION_LOG.md", "embed": true }`
+
+**If Memvid MCP unavailable:** Skip this step. Note "Memvid offline — using DECISION_LOG.md." and proceed.
+
+---
+
 ### Step 2 — Reasoning protocol
 For any task beyond standard CRUD, a new page copying an existing pattern, an isolated bug fix, or a style change — run `react-reasoning-protocol.md` BEFORE writing code. When in doubt: apply it.
 
@@ -37,9 +62,11 @@ If a request conflicts with `DECISION_LOG.md`, raise the conflict before impleme
 | Library installed / removed | `LIBRARY_LEDGER.md` — LL2 entry + summary table |
 | Library upgraded | `LIBRARY_LEDGER.md` — LL4 upgrade entry |
 | New VITE_ env var | `.env.example` + `lib/env.ts` schema + `LIBRARY_LEDGER.md` |
-| Architectural decision | `DECISION_LOG.md` — new entry |
-| Decision reversed | `DECISION_LOG.md` — REPLACE entry, never append |
+| Architectural decision (lib choice, state pattern, routing, auth) | `DECISION_LOG.md` — new entry + `memvid_put` to `frontend.mv2` or `shared.mv2` — format in `mcp-servers.md §8` |
+| API contract or integration point defined with backend | `memvid_put` to `shared.mv2` — tag `[type:api-contract]` — see `mcp-servers.md §8` |
+| Decision reversed | `DECISION_LOG.md` — REPLACE entry + `memvid_update` original frame (never append contradiction) |
 | Architecture style chosen | `AGENTS.md` — update folder structure section |
+| Session ending | `memvid_session { "file": "frontend.mv2", "stop": true }` |
 
 ---
 
