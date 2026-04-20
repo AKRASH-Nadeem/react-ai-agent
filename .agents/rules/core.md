@@ -9,6 +9,13 @@ trigger: always_on
 >
 > MCP: Call Context7 before writing any code touching an EXTERNAL library. React core hooks (useState, useEffect, useRef, useContext, useReducer, useId, use()) are exempt. All other libraries: Context7 first.
 
+> **Gemini 3 Flash — Model-Specific Directives (non-negotiable):**
+> 1. **Do NOT skip Step 1.5 (Memvid Bootstrap) under token or time pressure.** Local `.mv2` access is <5ms. "Context is tight" is not a valid reason to skip memory recall.
+> 2. **Skill descriptions are semantic triggers, not optional hints.** When a task matches a skill description, load it. Do not reason around it because it feels fast enough without it.
+> 3. **Thought signatures must be preserved** across multi-turn sessions (Gemini 3 API requirement). Ensure tool calls in agentic workflows return thought signatures to the model.
+> 4. **Temperature:** Use default (1.0). Do not set temperature < 1.0 — this causes looping on complex reasoning tasks.
+> 5. **MCP failure → CLI → DECISION_LOG.md.** Three-tier fallback. Never collapse to "skip memory" as a fallback.
+
 ---
 
 ## 🚀 Session Start — MANDATORY BEFORE ANY CODE
@@ -28,22 +35,35 @@ trigger: always_on
 
 > **MANDATORY — execute before any task. Do not skip under time pressure.**
 > Gemini 3 Flash: this step is non-negotiable even when context is tight.
+> Local `.mv2` files respond in <5ms — speed is never a reason to skip.
 
-**1. Init — verify or create .mv2 files:**
-- `memvid_stats { "file": "shared.mv2" }` → if error/missing: `memvid_create { "file": "shared.mv2" }`
-- `memvid_stats { "file": "frontend.mv2" }` → if error/missing: `memvid_create { "file": "frontend.mv2" }`
+**1. Init — verify or create .mv2 files (MCP):**
+- `memvid_stats { "file": "shared.mv2" }` → error/missing? → `memvid_create { "file": "shared.mv2" }`
+- `memvid_stats { "file": "frontend.mv2" }` → error/missing? → `memvid_create { "file": "frontend.mv2" }`
+
+**1a. Init — CLI fallback (if MCP unavailable after 2 attempts):**
+```bash
+memvid stats --file shared.mv2   || memvid create --file shared.mv2
+memvid stats --file frontend.mv2 || memvid create --file frontend.mv2
+```
+State: `"Memvid MCP unavailable — using CLI fallback for this session."`
 
 **2. Start session tracking:**
-- `memvid_session { "file": "frontend.mv2", "start": "fe-[YYYYMMDD-HH]" }`
+- MCP: `memvid_session { "file": "frontend.mv2", "start": "fe-[YYYYMMDD-HH]" }`
+- CLI: `memvid session --file frontend.mv2 --start "fe-[YYYYMMDD-HH]"`
 
-**3. Recall project context (ALWAYS run both):**
-- `memvid_find { "file": "shared.mv2", "query": "project architecture api contracts auth design system stack", "mode": "hybrid", "limit": 5 }`
-- `memvid_find { "file": "frontend.mv2", "query": "component conventions state management decisions patterns", "mode": "hybrid", "limit": 5 }`
+**3. Recall project context (ALWAYS run both — adapt query to the current task):**
+- `memvid_find { "file": "shared.mv2", "query": "api contracts auth error format base url environment", "mode": "hybrid", "limit": 5 }`
+- `memvid_find { "file": "frontend.mv2", "query": "component conventions state management decisions constraints", "mode": "hybrid", "limit": 5 }`
+- CLI: `memvid find --file shared.mv2 --query "api contracts auth" --mode hybrid --limit 5`
+- CLI: `memvid find --file frontend.mv2 --query "state conventions constraints" --mode hybrid --limit 5`
 
 **4. First run (both return empty):** Migrate `DECISION_LOG.md` entries:
-- `memvid_put_many { "file": "frontend.mv2", "input": "DECISION_LOG.md", "embed": true }`
+- MCP: `memvid_put_many { "file": "frontend.mv2", "input": "DECISION_LOG.md", "embed": true }`
+- CLI: `memvid put-many --file frontend.mv2 --input DECISION_LOG.md --embed`
 
-**If Memvid MCP unavailable:** Skip this step. Note "Memvid offline — using DECISION_LOG.md." and proceed.
+**If Memvid MCP AND CLI both unavailable:** Note "Memvid offline — using DECISION_LOG.md." and proceed.
+Full memory strategy in `skills/memory-management/SKILL.md`.
 
 ---
 
@@ -62,9 +82,9 @@ If a request conflicts with `DECISION_LOG.md`, raise the conflict before impleme
 | Library installed / removed | `LIBRARY_LEDGER.md` — LL2 entry + summary table |
 | Library upgraded | `LIBRARY_LEDGER.md` — LL4 upgrade entry |
 | New VITE_ env var | `.env.example` + `lib/env.ts` schema + `LIBRARY_LEDGER.md` |
-| Architectural decision (lib choice, state pattern, routing, auth) | `DECISION_LOG.md` — new entry + `memvid_put` to `frontend.mv2` or `shared.mv2` — format in `mcp-servers.md §8` |
-| API contract or integration point defined with backend | `memvid_put` to `shared.mv2` — tag `[type:api-contract]` — see `mcp-servers.md §8` |
-| Decision reversed | `DECISION_LOG.md` — REPLACE entry + `memvid_update` original frame (never append contradiction) |
+| Architectural decision (lib choice, state pattern, routing, auth) | `DECISION_LOG.md` — new entry + `memvid_put` to `frontend.mv2` or `shared.mv2`. Full format in `skills/memory-management/SKILL.md §MEMORY FORMAT` |
+| API contract or integration point defined with backend | `memvid_put` to `shared.mv2` — tag `[type:api-contract]` — format in `skills/memory-management/SKILL.md` |
+| Decision reversed | `DECISION_LOG.md` — REPLACE entry + `memvid_update` original frame (never append contradiction). See `skills/memory-management/SKILL.md §MEMORY HYGIENE` |
 | Architecture style chosen | `AGENTS.md` — update folder structure section |
 | Session ending | `memvid_session { "file": "frontend.mv2", "stop": true }` |
 

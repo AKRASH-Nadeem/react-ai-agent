@@ -123,8 +123,13 @@ cat package.json | grep -q "@storybook" && echo "AVAILABLE" || echo "NOT_INSTALL
 **Purpose**: Persistent, cross-session memory for architectural decisions, team conventions,
 and project preferences. Uses portable `.mv2` files — no databases, no infrastructure.
 
-> **Load `skills/memvid-docs/SKILL.md`** when troubleshooting Memvid, configuring files,
-> or needing the full 40-tool reference. For day-to-day use, this section is sufficient.
+> **Full reference in `skills/memory-management/SKILL.md`** — covers what to store, what not
+> to store, CLI fallbacks, shared.mv2 reading strategy, and memory hygiene. Read it for any
+> memory question beyond the daily workflow below.
+
+> **MCP failure → CLI fallback**: If MCP tools fail twice in a row, switch to CLI commands
+> for the session. CLI maps 1:1 to MCP tools. See `skills/memory-management/SKILL.md §CLI FALLBACK`.
+> If CLI also unavailable → `DECISION_LOG.md` + `SHARED_CONTRACTS.md`.
 
 ### Memory file topology:
 ```
@@ -135,22 +140,26 @@ shared.mv2    → SHARED cross-agent memory (API contracts, auth, error formats)
 
 ### Session Start — Full Init Sequence
 
-Run at session start (also covered in `core.md` Step 1.5):
+Run at session start (also covered in `core.md` Step 1.5). Use MCP; fall back to CLI if MCP fails twice:
 
 ```
 # 1. Verify files exist (create if missing)
 memvid_stats { "file": "shared.mv2" }    → error? → memvid_create { "file": "shared.mv2" }
 memvid_stats { "file": "frontend.mv2" }  → error? → memvid_create { "file": "frontend.mv2" }
+# CLI fallback: memvid stats --file shared.mv2 || memvid create --file shared.mv2
 
 # 2. Start session
 memvid_session { "file": "frontend.mv2", "start": "fe-[YYYYMMDD-HH]" }
+# CLI fallback: memvid session --file frontend.mv2 --start "fe-[YYYYMMDD-HH]"
 
-# 3. Recall context
-memvid_find { "file": "shared.mv2", "query": "project architecture api contracts auth design system", "mode": "hybrid", "limit": 5 }
-memvid_find { "file": "frontend.mv2", "query": "component conventions state management decisions", "mode": "hybrid", "limit": 5 }
+# 3. Recall context — ALWAYS run both, adapt query to the current task
+memvid_find { "file": "shared.mv2", "query": "api contracts auth error format base url environment", "mode": "hybrid", "limit": 5 }
+memvid_find { "file": "frontend.mv2", "query": "component conventions state management constraints decisions", "mode": "hybrid", "limit": 5 }
+# CLI fallback: memvid find --file shared.mv2 --query "api contracts auth" --mode hybrid --limit 5
 
-# 4. First run only
+# 4. First run only (both return empty)
 memvid_put_many { "file": "frontend.mv2", "input": "DECISION_LOG.md", "embed": true }
+# CLI fallback: memvid put-many --file frontend.mv2 --input DECISION_LOG.md --embed
 ```
 
 ### Storing a memory (memvid_put):
@@ -185,10 +194,11 @@ memvid_session { "file": "frontend.mv2", "stop": true }
 ### Resolution protocol:
 ```
 1. memvid_find on shared.mv2 + frontend.mv2 → results found → use them
-2. Returns empty → build fresh from DECISION_LOG.md
-3. Memvid unavailable → DECISION_LOG.md; cross-agent: SHARED_CONTRACTS.md
-4. Neither exist → Ask: A) Setup Memvid  B) Create DECISION_LOG.md  C) Start fresh
-5. Never skip recall. Project context overrides training memory.
+2. MCP fails twice → try CLI: memvid find --file [file] --query "[query]"
+3. Both return empty → build fresh from DECISION_LOG.md
+4. Memvid fully unavailable → DECISION_LOG.md; cross-agent: SHARED_CONTRACTS.md
+5. Neither exist → Ask: A) Setup Memvid  B) Create DECISION_LOG.md  C) Start fresh
+6. Never skip recall. Project context overrides training memory.
 ```
 
 ### Conflict resolution:
@@ -244,6 +254,6 @@ Utility:   memvid_process_queue, memvid_verify_single_file, memvid_config, memvi
 | Magic UI | ReactBits → build from scratch with `react-animations` |
 | ReactBits | Build from scratch with `react-animations` skill |
 | Storybook | File-system discovery — treat as not installed |
-| Memvid | DECISION_LOG.md; cross-agent: SHARED_CONTRACTS.md |
+| Memvid MCP | CLI: `memvid find/put/create` → then DECISION_LOG.md; cross-agent: SHARED_CONTRACTS.md |
 | Figma | Request design spec via screenshot from user |
 | Fetch | Note limitation, use training memory with caveat |

@@ -12,21 +12,35 @@ trigger: always_on
 
 > **MANDATORY — Gemini 3 Flash: do NOT skip this even under context pressure.**
 > Memory recall costs 2 tool calls. Missing project context costs hours of wrong direction.
+> Local `.mv2` access is <5ms — no latency excuse exists for skipping.
 
-If Memvid MCP is connected, execute BEFORE scanning the skill registry:
+**If Memvid MCP is connected**, execute BEFORE scanning the skill registry:
 
 ```
 memvid_find { "file": "shared.mv2", "query": "[task-relevant keywords]", "mode": "hybrid", "limit": 5 }
 memvid_find { "file": "frontend.mv2", "query": "[task-relevant keywords]", "mode": "hybrid", "limit": 5 }
 ```
 
-**Derive the query from the task.** Examples:
-- Building auth UI → `"query": "authentication strategy tokens session frontend"`
-- New component → `"query": "component patterns conventions design system"`
-- State management question → `"query": "state management zustand redux decision"`
-- API integration → `"query": "api contract endpoint error format backend"`
+**If Memvid MCP is unavailable (fails twice)**, use CLI fallback:
+```bash
+memvid find --file shared.mv2 --query "[task-relevant keywords]" --mode hybrid --limit 5
+memvid find --file frontend.mv2 --query "[task-relevant keywords]" --mode hybrid --limit 5
+```
 
-**If Memvid not connected:** Skip to Step 0. Note: "Memvid offline — using DECISION_LOG.md."
+**If CLI also unavailable:** Skip to Step 0. Note: `"Memvid offline — using DECISION_LOG.md."`
+
+**Derive the query from the task.** Examples:
+- Building auth UI → `"query": "authentication strategy tokens session frontend refresh"`
+- New component → `"query": "component patterns conventions design system folder structure"`
+- State management question → `"query": "state management zustand redux decision constraint"`
+- API integration → `"query": "api contract endpoint error format auth token backend"`
+- Styling/design → `"query": "design tokens oklch color system shadcn tailwind conventions"`
+- Form work → `"query": "form validation react-hook-form zod convention"`
+- Performance → `"query": "bundle size limit performance constraint lazy loading"`
+- New library → `"query": "library decision constraint rejected alternative"`
+
+**Apply results immediately:** If recall returns a matching decision, it overrides training memory.
+Example: recall says "Zustand chosen" → do NOT suggest Redux.
 
 ---
 
@@ -68,7 +82,7 @@ READ: .agents/skills/design-philosophy/SKILL.md
 | `.agents/skills/react-troubleshooting/SKILL.md` | not working, weird behavior, useEffect running twice, stale closure, too many re-renders, hydration error, white screen, layout shift |
 | `.agents/skills/react-typescript-advanced/SKILL.md` | TypeScript, type definitions, generics, discriminated unions, type safety, satisfies, infer, conditional types, unknown vs any, component typing, Zod inference |
 | `.agents/skills/ux-interaction/SKILL.md` | user flow, onboarding, empty state, navigation, IA, modal, toast, confirmation, dashboard layout, UX review |
-| `.agents/skills/memvid-docs/SKILL.md` | Memvid troubleshooting, configure memory files, knowledge graph, session replay, .mv2 advanced operations, embedding setup |
+| `.agents/skills/memory-management/SKILL.md` | Memvid troubleshooting, configure memory files, knowledge graph, session replay, .mv2 advanced operations, embedding setup |
 
 ### 0.3 — Announce loaded skills before proceeding
 
